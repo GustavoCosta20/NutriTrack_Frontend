@@ -1,0 +1,118 @@
+.page-wrapper {
+  display: flex;             // Ativa o modo flexbox
+  align-items: center;       // Centraliza na vertical
+  justify-content: center;   // Centraliza na horizontal
+  min-height: 100vh;         // Garante que a altura seja no mínimo 100% da tela
+  padding: 2rem;             // Adiciona um respiro nas laterais em telas menores
+  box-sizing: border-box;
+}
+
+.auth-container {
+  max-width: 550px;
+  width: 500px;
+  padding: 7rem;   // Espaçamento interno generoso
+  background-color: #fdf3ca; // Fundo branco para contraste
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Sombra mais suave
+}
+
+.logo-container {
+  text-align: center;
+  margin: 0.1rem;
+}
+
+.logo-container img {
+  max-width: 450px;
+  height: auto;
+}
+
+// Títulos e textos com melhor hierarquia
+h2 {
+  text-align: center;
+  margin: 0.1rem;
+  font-size: 2.5rem;
+  color: var(--cor-secundaria);
+}
+
+p {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #666;
+  font-size: 1.5rem;
+}
+
+// Estilos para o grupo de formulário e labels
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 800; // Semi-bold
+  color: #555;
+  font-size: 1.5rem;
+}
+
+// Estilos para os campos de input
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 1rem; 
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #f9f9f9; // Fundo do input cinza claro
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+// Efeito de foco para os inputs
+input:focus {
+  outline: none;
+  border-color: var(--cor-primaria); // Borda fica amarela ao focar
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25);
+}
+
+// Botão com a cor primária de destaque
+button {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: var(--cor-primaria); // Amarelo forte
+  color: var(--cor-secundaria); // Texto escuro para contraste
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: var(--cor-primaria-escura);
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+// Link para a página de registro
+.switch-link {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  a {
+    color: var(--cor-primaria-escura);
+    text-decoration: none;
+    font-weight: 600;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// Mensagens de erro
+.error-message {
+  color: var(--cor-erro);
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}

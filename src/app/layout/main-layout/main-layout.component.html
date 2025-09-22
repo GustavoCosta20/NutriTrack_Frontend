@@ -1,0 +1,30 @@
+<div class="layout-container">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/images/logo.png" alt="Logo NutriTrack" class="logo">
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="icon-dashboard"></i> <span>Dashboard</span>
+      </a>
+      <a routerLink="/meu-perfil" routerLinkActive="active">
+        <i class="icon-profile"></i>
+        <span>Meu Perfil</span>
+      </a>
+      <a routerLink="/historico" routerLinkActive="active">
+        <i class="icon-history"></i>
+        <span>Histórico</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="#">
+        <i class="icon-logout"></i>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,203 @@
+.dashboard-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+}
+
+.card {
+  background-color: var(--cor-branca);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.75rem;
+  }
+}
+
+// Cards específicos
+.calorias-card, .macros-card, .progresso-card {
+  min-height: 300px;
+}
+
+.calorias-card {
+  text-align: center;
+  justify-content: center;
+
+  .calorias-valor {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--cor-primaria-escura);
+    line-height: 1;
+  }
+
+  .calorias-label {
+    font-size: 1.5rem;
+    color: #aaa;
+  }
+}
+
+.macros-card .macros-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.macros-card .macro-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
+  
+  .macro-label { color: #555; }
+  .macro-valor { font-weight: 600; }
+}
+
+// Estilos da Barra de Progresso (dentro do card de calorias)
+.progresso-wrapper {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 12px;
+  background-color: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+}
+
+.progress-bar-vermelho {
+  background-color: #dc3545; // Cor de erro
+}
+
+.progress-bar-amarelo {
+  background-color: var(--cor-primaria); // Nosso amarelo principal
+}
+
+// Verde para progresso alto (66-100%)
+.progress-bar-verde {
+  background-color: #28a745; // Cor de sucesso
+}
+
+.progresso-texto-calorias {
+  display: block;
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 0.5rem;
+}
+
+// Estilos do Gráfico de Progresso
+.progresso-card .chart-container {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progresso-card .placeholder-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  flex-grow: 1;
+}
+
+.progresso-card .btn-simular {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--cor-primaria);
+  background-color: transparent;
+  color: var(--cor-primaria-escura);
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: var(--cor-primaria);
+    color: var(--cor-secundaria);
+  }
+}
+
+// Card do Chat
+.chat-card {
+  grid-column: 1 / -1;
+}
+
+.chat-card .chat-window {
+  height: 150px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow-y: auto;
+}
+
+.chat-card .gemini-message {
+  background-color: #f1f1f1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.chat-card .chat-input-form {
+  display: flex;
+  gap: 0.5rem;
+
+  input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--cor-primaria);
+    color: var(--cor-secundaria);
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    &:hover { background-color: var(--cor-primaria-escura); }
+  }
+}

@@ -1,0 +1,107 @@
+.page-wrapper {
+  display: flex;
+  align-items: center;       // Centraliza na vertical
+  justify-content: center;   // Centraliza na horizontal
+  min-height: 100%;          // Garante que ocupe toda a altura disponível
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.profile-container {
+  max-width: 960px;
+  background-color: var(--cor-branca);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem; // Mais espaço
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+
+  h2 { margin: 0; font-size: 1.8rem; }
+
+  button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    // (copie o resto do estilo do botão do seu login.scss)
+  }
+}
+
+/* ESTILOS PARA O NOVO MODO DE VISUALIZAÇÃO */
+.profile-summary {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;    
+  gap: 1rem;             
+  margin-bottom: 3rem;
+}
+
+.avatar-placeholder {
+  width: 90px; 
+  height: 90px;
+  border-radius: 50%;
+  background-color: var(--cor-primaria);
+  color: var(--cor-secundaria);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.user-details {
+  text-align: center;
+  .user-name {
+    font-size: 1.8rem;
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+  }
+  .user-email {
+    color: #777;
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+.profile-section {
+  margin-bottom: 2.5rem;
+  h4 {
+    font-size: 1.1rem;
+    color: var(--cor-primaria-escura);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--cor-primaria);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.info-item {
+  label {
+    display: block;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+  }
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+.profile-edit {
+  // Cole aqui os estilos .form-group, etc. que você já tem
+}

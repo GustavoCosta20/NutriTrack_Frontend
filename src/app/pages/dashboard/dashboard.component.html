@@ -1,0 +1,78 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>Olá, {{ nomeUsuario }}!</h1>
+    <p>Este é o seu plano para atingir o objetivo: <strong>{{ objetivo }}</strong></p>
+  </header>
+
+  <main class="dashboard-grid">
+    <div class="card calorias-card">
+      <h3>Sua Meta Diária</h3>
+      <div class="calorias-valor">{{ caloriasMeta }}</div>
+      <div class="calorias-label">kcal</div>
+      <div class="progresso-wrapper">
+        <div class="progress-bar-container">
+          <div 
+            class="progress-bar" 
+            [style.width.%]="calcularPercentual(caloriasConsumidas, caloriasMeta)"
+            [ngClass]="getBarraCorClasse()"> </div>
+        </div>
+        <span class="progresso-texto-calorias">{{ caloriasConsumidas | number:'1.0-0' }} / {{ caloriasMeta }} kcal consumidas</span>
+      </div>
+    </div>
+
+    <div class="card macros-card">
+      <h3>Distribuição de Macros (Metas)</h3>
+      <div class="macros-grid">
+        <div class="macro-item">
+          <span class="macro-label">Proteínas</span>
+          <span class="macro-valor">{{ proteinasMeta }}g</span>
+        </div>
+        <div class="macro-item">
+          <span class="macro-label">Carboidratos</span>
+          <span class="macro-valor">{{ carboidratosMeta }}g</span>
+        </div>
+        <div class="macro-item">
+          <span class="macro-label">Gorduras</span>
+          <span class="macro-valor">{{ gordurasMeta }}g</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card progresso-card">
+      <h3>Progresso de Hoje (Macros Consumidos)</h3>
+      
+      <div *ngIf="hasConsumedData; else noDataPlaceholder" class="chart-container">
+        <ngx-charts-pie-chart
+          [results]="dadosDoGrafico"
+          [customColors]="colorScheme"
+          [doughnut]="true"
+          [legend]="true"
+          [legendTitle]="''"
+          [labels]="true">
+        </ngx-charts-pie-chart>
+      </div>
+
+      <ng-template #noDataPlaceholder>
+        <div class="placeholder-container">
+          <p>Registre sua primeira refeição para ver o progresso do seu dia!</p>
+        </div>
+      </ng-template>
+      
+      <button (click)="simularAdicaoRefeicao()" class="btn-simular">Simular Adição de Refeição</button>
+    </div>
+
+    <div class="card chat-card">
+      <h3>Registre sua Refeição</h3>
+      <p>Descreva o que você comeu. Ex: "1 pão francês com 2 ovos mexidos e 1 copo de café com leite".</p>
+      
+      <div class="chat-window">
+        <div class="gemini-message">Olá! Sou sua assistente NutriTrack. O que você comeu hoje?</div>
+      </div>
+      
+      <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
+        <input type="text" name="chatInput" placeholder="Digite sua refeição aqui..." autocomplete="off">
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </main>
+</div>
