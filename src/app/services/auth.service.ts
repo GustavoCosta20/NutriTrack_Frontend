@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient } from '@angular/common/http'
 import { LoginUser } from '../models/login-user.model'; 
 import { tap } from 'rxjs';
+import { UserProfileDto } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +12,16 @@ import { tap } from 'rxjs';
 export class AuthService {
   // apiUrl: 'https://localhost:5243/api/user' | undefined;
 
+  private apiUrl = 'https://localhost:5243/api';
+
   constructor(private http: HttpClient) { }
 
   register(registerData: RegisterUser): Observable<any> {
-    return this.http.post(`https://localhost:5243/api/user/register`, registerData);
+    return this.http.post(`${this.apiUrl}/user/register`, registerData);
   }
 
   login(loginData: LoginUser): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`https://localhost:5243/api/user/login`, loginData).pipe(
+    return this.http.post<{ token: string }>(`${this.apiUrl}/user/login`, loginData).pipe(
       tap((response: { token: string; }) => {
         // Se a resposta contiver um token, salve-o no Local Storage do navegador
         if (response && response.token) {
@@ -28,4 +31,9 @@ export class AuthService {
       })
     );
   }
+
+  getUserProfile(): Observable<UserProfileDto> {
+    return this.http.get<UserProfileDto>(`${this.apiUrl}/user/me`);
+  }
+
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,13 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DashboardComponent implements OnInit {
 
-  // --- DADOS DE METAS (Vindos da API no futuro) ---
-  nomeUsuario: string = "Gustavo";
-  objetivo: string = "Ganhar Massa Muscular";
-  caloriasMeta: number = 2650;
-  proteinasMeta: number = 180;
-  carboidratosMeta: number = 320;
-  gordurasMeta: number = 70;
+  // --- DADOS DE METAS 
+  nomeUsuario: string = "Carregando...";
+  objetivo: string = "-";
+  caloriasMeta: number = 0;
+  proteinasMeta: number = 0;
+  carboidratosMeta: number = 0;
+  gordurasMeta: number = 0;
 
   // --- DADOS PROGRESSO DIÁRIO ---
   caloriasConsumidas: number = 0;
@@ -22,6 +23,31 @@ export class DashboardComponent implements OnInit {
   gordurasConsumidas: number = 0;
 
   dadosDoGrafico: { name: string, value: number }[] = [];
+  colorScheme = {
+    domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
+  };
+
+  constructor(private authService: AuthService) { }
+
+  ngOnInit(): void {
+    // Busca o perfil do usuário na API
+    this.authService.getUserProfile().subscribe({
+      next: (profile) => {
+        this.nomeUsuario = profile.nomeCompleto;
+        this.objetivo = profile.objetivo;
+        this.caloriasMeta = profile.metaCalorias;
+        this.proteinasMeta = profile.metaProteinas;
+        this.carboidratosMeta = profile.metaCarboidratos;
+        this.gordurasMeta = profile.metaGorduras;
+
+        this.atualizarDadosDoGrafico();
+      },
+      error: (err) => {
+        console.error('Erro ao buscar perfil do usuário', err);
+        this.nomeUsuario = "Erro ao carregar";
+      }
+    });
+  }
 
   get macroDataForChart(): { name: string, value: number }[] {
     return [
@@ -41,22 +67,9 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-
-  // Cores gráfico
-  colorScheme = {
-    domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
-  };
-
   get hasConsumedData(): boolean {
     // Retorna verdadeiro se qualquer um dos macros consumidos for maior que zero
     return this.proteinasConsumidas > 0 || this.carboidratosConsumidos > 0 || this.gordurasConsumidas > 0;
-  }
-
-  constructor() { }
-
-  ngOnInit(): void {
-    // No futuro, aqui chamar serviço para busca dos dados do usuário da API.
-    this.atualizarDadosDoGrafico(); 
   }
 
   atualizarDadosDoGrafico(): void {
@@ -100,6 +113,14 @@ export class DashboardComponent implements OnInit {
     console.log('Refeição adicionada!', { consumido: this.caloriasConsumidas, meta: this.caloriasMeta });
   }
 
-  // ... (método enviarMensagemChat continua aqui)
-  enviarMensagemChat(event: Event) { /* ... */ }
+  enviarMensagemChat(event: Event) { 
+    event.preventDefault();
+    const inputElement = (event.target as HTMLFormElement).elements.namedItem('chatInput') as HTMLInputElement;
+    const mensagem = inputElement.value;
+    if (mensagem.trim()) {
+      console.log('Mensagem para o Gemini:', mensagem);
+      // Próximo passo: chamar um método no AuthService para enviar ao backend
+      inputElement.value = '';
+    }
+  }
 }
