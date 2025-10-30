@@ -1,0 +1,71 @@
+<div class="page-wrapper">
+
+  <div class="profile-container">
+    <header class="profile-header">
+      <h2>Meu Perfil</h2>
+      <button (click)="toggleEditMode()">{{ editMode ? 'Cancelar' : 'Editar Perfil' }}</button>
+    </header>
+
+    <section *ngIf="!editMode" class="profile-view">
+      
+      <div class="profile-summary">
+        <div class="avatar-placeholder">
+          <span>{{ currentUser.nomeCompleto.charAt(0) }}</span>
+        </div>
+        <div class="user-details">
+          <h3 class="user-name">{{ currentUser.nomeCompleto }}</h3>
+          <p class="user-email">{{ currentUser.email }}</p>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h4>Dados Físicos</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Altura</label>
+            <span>{{ currentUser.alturaEmCm }} cm</span>
+          </div>
+          <div class="info-item">
+            <label>Peso</label>
+            <span>{{ currentUser.pesoEmKg }} Kg</span>
+          </div>
+          <div class="info-item">
+            <label>Data de Nascimento</label>
+            <span>{{ currentUser.dataNascimento | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Gênero</label>
+            <span>{{ generoTexto }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h4>Meu Plano Atual</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Objetivo</label>
+            <span>{{ objetivoTexto }}</span>
+          </div>
+          <div class="info-item">
+            <label>Nível de Atividade</label>
+            <span>{{ nivelAtividadeTexto }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="editMode" class="profile-edit">
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        
+        <div class="form-group">
+          <label for="nomeCompleto">Nome Completo</label>
+          <input type="text" id="nomeCompleto" formControlName="nomeCompleto">
+        </div>
+        
+        <button type="submit" [disabled]="profileForm.invalid">Salvar Alterações</button>
+      </form>
+    </section>
+    
+  </div>
+  </div>

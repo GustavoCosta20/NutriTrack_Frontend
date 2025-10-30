@@ -1,0 +1,17 @@
+:root {
+  --cor-primaria: #FFC107;      // Um tom de amarelo (Amber do Material Design)
+  --cor-primaria-escura: #FFA000; // Um tom mais escuro para o efeito :hover do botão
+  --cor-secundaria: #343a40;    // Um cinza escuro/quase preto para texto e detalhes
+  --cor-fundo: #ead626;         // Um cinza bem claro para o fundo da página
+  --cor-texto: #333;           // Cor principal do texto
+  --cor-sucesso: #28a745;       // Verde para mensagens de sucesso
+  --cor-erro: #dc3545;         // Vermelho para mensagens de erro (já usamos este)
+  --cor-branca: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+}
