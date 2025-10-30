@@ -8,8 +8,8 @@
 
 # Node
 /node_modules
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-error.log*
 
 # IDEs and editors
 .idea/
@@ -41,16 +41,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Dependências do Node.js (Angular, React, etc.)
-/node_modules
-
 # Arquivos e pastas do Visual Studio / .NET
 .vs/
 *.slnx
 *.slnx.sqlite
 [Bb]in/
 [Oo]bj/
-
-# Logs
-npm-debug.log*
-yarn-error.log*
