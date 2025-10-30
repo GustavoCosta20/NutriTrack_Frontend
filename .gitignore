@@ -40,3 +40,17 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Dependências do Node.js (Angular, React, etc.)
+/node_modules
+
+# Arquivos e pastas do Visual Studio / .NET
+.vs/
+*.slnx
+*.slnx.sqlite
+[Bb]in/
+[Oo]bj/
+
+# Logs
+npm-debug.log*
+yarn-error.log*
