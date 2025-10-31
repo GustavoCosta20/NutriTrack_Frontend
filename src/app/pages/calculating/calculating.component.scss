@@ -1,0 +1,49 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.logo-container img {
+  max-width: 220px;
+  margin-bottom: 2rem;
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  color: var(--cor-secundaria);
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar-container {
+  width: 80%;
+  max-width: 400px;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden; // Garante que a barra interna não saia das bordas
+}
+
+.progress-bar {
+  height: 100%;
+  width: 100%; // Começa com largura total
+  background-color: var(--cor-primaria); // Usa nosso amarelo
+  border-radius: 10px;
+
+  // Animação da barra de progresso
+  transform-origin: left; // Animação começa da esquerda
+  animation: progress-animation 10s linear forwards;
+}
+
+// Define a animação
+@keyframes progress-animation {
+  from {
+    transform: scaleX(0); // Começa com 0% de largura
+  }
+  to {
+    transform: scaleX(1); // Termina com 100% de largura
+  }
+}
