@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RegisterUser } from '../models/register-user.model';
 import { Observable } from 'rxjs/internal/Observable';
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { LoginUser } from '../models/login-user.model'; 
 import { tap } from 'rxjs';
 import { UserProfileDto } from '../models/user.model';
@@ -33,7 +33,22 @@ export class AuthService {
   }
 
   getUserProfile(): Observable<UserProfileDto> {
-    return this.http.get<UserProfileDto>(`${this.apiUrl}/user/me`);
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<UserProfileDto>(`${this.apiUrl}/user/me`, { headers });
+  }
+
+  updateUserProfile(userData: any): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.put(`${this.apiUrl}/user/me`, userData, { headers });
   }
 
 }

@@ -137,14 +137,40 @@ export class ProfileComponent implements OnInit {
 
   onSubmit(): void {
     if (this.profileForm.invalid) {
+      this.error = 'Por favor, preencha todos os campos obrigatórios.';
       return;
     }
 
-    console.log('Dados salvos:', this.profileForm.value);
-    // Aqui você chamaria um serviço para enviar os dados para a API
+    // Prepara os dados para enviar ao backend
+    const updatedData = {
+      nomeCompleto: this.profileForm.get('nomeCompleto')?.value,
+      dataNascimento: this.profileForm.get('dataNascimento')?.value,
+      alturaEmCm: Number(this.profileForm.get('alturaEmCm')?.value),
+      pesoEmKg: Number(this.profileForm.get('pesoEmKg')?.value),
+      genero: Number(this.profileForm.get('genero')?.value),
+      nivelDeAtividade: Number(this.profileForm.get('nivelDeAtividade')?.value),
+      objetivo: Number(this.profileForm.get('objetivo')?.value)
+    };
 
-    // Atualiza os dados locais e sai do modo de edição
-    this.currentUser = { ...this.currentUser, ...this.profileForm.value };
-    this.editMode = false;
+    this.authService.updateUserProfile(updatedData).subscribe({
+      next: (response) => {       
+        // Atualiza os dados locais com os novos valores
+        this.currentUser = {
+          ...this.currentUser,
+          nomeCompleto: updatedData.nomeCompleto,
+          dataNascimento: updatedData.dataNascimento,
+          alturaEmCm: updatedData.alturaEmCm,
+          pesoEmKg: updatedData.pesoEmKg,
+          genero: updatedData.genero,
+          nivelDeAtividade: updatedData.nivelDeAtividade,
+          objetivo: updatedData.objetivo
+        };
+
+        this.editMode = false;
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar perfil:', err);
+      }
+    });
   }
 }
