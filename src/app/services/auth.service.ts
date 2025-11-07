@@ -51,4 +51,20 @@ export class AuthService {
     return this.http.put(`${this.apiUrl}/user/me`, userData, { headers });
   }
 
+  questionForIA(question: string): Observable<string> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    // Encode da pergunta para URL
+    const params = { pergunta: question };
+
+    return this.http.get<string>(`${this.apiUrl}/ai/connection`, { 
+      headers, 
+      params,
+      responseType: 'text' as 'json'
+    });
+  }
+
 }

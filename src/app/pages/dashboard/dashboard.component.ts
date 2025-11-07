@@ -27,6 +27,17 @@ export class DashboardComponent implements OnInit {
     domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
   };
 
+  //Propriedades do Chat
+  mensagensChat: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }> = [
+    { 
+      texto: 'Olá! Sou sua assistente NutriTrack. O que você comeu hoje?', 
+      tipo: 'ia',
+      timestamp: new Date()
+    }
+  ];
+
+  aguardandoResposta = false;
+
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
@@ -34,7 +45,7 @@ export class DashboardComponent implements OnInit {
     this.authService.getUserProfile().subscribe({
       next: (profile) => {
         this.nomeUsuario = profile.nomeCompleto;
-        this.objetivo = profile.objetivo;
+        this.objetivo = this.formatarObjetivo(profile.objetivo);
         this.caloriasMeta = profile.metaCalorias;
         this.proteinasMeta = profile.metaProteinas;
         this.carboidratosMeta = profile.metaCarboidratos;
@@ -117,10 +128,62 @@ export class DashboardComponent implements OnInit {
     event.preventDefault();
     const inputElement = (event.target as HTMLFormElement).elements.namedItem('chatInput') as HTMLInputElement;
     const mensagem = inputElement.value;
-    if (mensagem.trim()) {
-      console.log('Mensagem para o Gemini:', mensagem);
-      // Próximo passo: chamar um método no AuthService para enviar ao backend
+    
+    if (mensagem.trim() && !this.aguardandoResposta) {
+      // Adicionar mensagem do usuário ao chat
+      this.mensagensChat.push({
+        texto: mensagem,
+        tipo: 'usuario',
+        timestamp: new Date()
+      });
+      
       inputElement.value = '';
+      this.aguardandoResposta = true;
+      
+      // Chamar o serviço para enviar ao backend
+      this.authService.questionForIA(mensagem).subscribe({
+        next: (resposta) => {
+          // Adicionar resposta da IA ao chat
+          this.mensagensChat.push({
+            texto: resposta,
+            tipo: 'ia',
+            timestamp: new Date()
+          });
+          this.aguardandoResposta = false;
+          
+          // Auto-scroll para a última mensagem
+          setTimeout(() => this.scrollToBottom(), 100);
+        },
+        error: (erro) => {
+          console.error('Erro ao enviar mensagem:', erro);
+          this.mensagensChat.push({
+            texto: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+            tipo: 'ia',
+            timestamp: new Date()
+          });
+          this.aguardandoResposta = false;
+        }
+      });
+      
+      // Auto-scroll após adicionar mensagem do usuário
+      setTimeout(() => this.scrollToBottom(), 100);
     }
+  }
+
+  private scrollToBottom(): void {
+    const chatWindow = document.querySelector('.chat-window');
+    if (chatWindow) {
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  }
+
+  private formatarObjetivo(objetivo: string): string {
+    const mapeamento: { [key: string]: string } = {
+      'PerderGordura': 'Perder Gordura',
+      'TrocarGordura': 'Trocar Gordura',
+      'GanharMassa': 'Ganhar Massa'
+    };
+    
+    return mapeamento[objetivo] || 'Objetivo não definido';
   }
 }
