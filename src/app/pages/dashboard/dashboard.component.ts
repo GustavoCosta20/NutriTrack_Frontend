@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { RefeicaoDto } from 'src/app/models/snack.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +23,9 @@ export class DashboardComponent implements OnInit {
   carboidratosConsumidos: number = 0;
   gordurasConsumidas: number = 0;
 
+  // --- REFEIÇÕES DO DIA ---
+  refeicoesDeHoje: RefeicaoDto[] = [];
+
   dadosDoGrafico: { name: string, value: number }[] = [];
   colorScheme = {
     domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
@@ -30,7 +34,7 @@ export class DashboardComponent implements OnInit {
   //Propriedades do Chat
   mensagensChat: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }> = [
     { 
-      texto: 'Olá! Sou sua assistente NutriTrack. O que você comeu hoje?', 
+      texto: 'Olá! Sou sua assistente NutriTrack. Descreva o que você comeu para eu registrar sua refeição. Ex: "2 ovos mexidos, 1 pão francês e 1 copo de café com leite"', 
       tipo: 'ia',
       timestamp: new Date()
     }
@@ -41,7 +45,11 @@ export class DashboardComponent implements OnInit {
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-    // Busca o perfil do usuário na API
+    this.carregarDadosUsuario();
+    this.carregarRefeicoesDeHoje();
+  }
+
+  carregarDadosUsuario(): void {
     this.authService.getUserProfile().subscribe({
       next: (profile) => {
         this.nomeUsuario = profile.nomeCompleto;
@@ -50,12 +58,29 @@ export class DashboardComponent implements OnInit {
         this.proteinasMeta = profile.metaProteinas;
         this.carboidratosMeta = profile.metaCarboidratos;
         this.gordurasMeta = profile.metaGorduras;
-
-        this.atualizarDadosDoGrafico();
       },
       error: (err) => {
         console.error('Erro ao buscar perfil do usuário', err);
         this.nomeUsuario = "Erro ao carregar";
+      }
+    });
+  }
+
+  carregarRefeicoesDeHoje(): void {
+    this.authService.obterRefeicoesDeHoje().subscribe({
+      next: (response) => {
+        this.refeicoesDeHoje = response.refeicoes;
+        
+        // Atualiza os totais consumidos
+        this.caloriasConsumidas = response.totais.calorias;
+        this.proteinasConsumidas = response.totais.proteinas;
+        this.carboidratosConsumidos = response.totais.carboidratos;
+        this.gordurasConsumidas = response.totais.gorduras;
+
+        this.atualizarDadosDoGrafico();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar refeições de hoje', err);
       }
     });
   }
@@ -79,7 +104,6 @@ export class DashboardComponent implements OnInit {
   }
 
   get hasConsumedData(): boolean {
-    // Retorna verdadeiro se qualquer um dos macros consumidos for maior que zero
     return this.proteinasConsumidas > 0 || this.carboidratosConsumidos > 0 || this.gordurasConsumidas > 0;
   }
 
@@ -91,39 +115,15 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  /**
-   Calcula o percentual do valor consumido em relação à meta.
-   Limita o resultado a 100% para a barra de progresso não ultrapassar o limite.
-   */
   calcularPercentual(consumido: number, meta: number): number {
     if (meta === 0) return 0;
     const percentual = (consumido / meta) * 100;
-    return Math.min(percentual, 100); // Retorna o menor valor entre o percentual e 100
+    return Math.min(percentual, 100);
   }
 
   /**
-   * Método de simulação para adicionar uma refeição e ver o progresso mudar.
+   * NOVO: Enviar mensagem e criar refeição
    */
-  simularAdicaoRefeicao(): void {
-    // Exemplo de uma refeição
-    const refeicao = {
-      calorias: 450,
-      proteinas: 30,
-      carboidratos: 55,
-      gorduras: 12
-    };
-
-    // Adiciona os valores da refeição aos totais consumidos
-    this.caloriasConsumidas += refeicao.calorias;
-    this.proteinasConsumidas += refeicao.proteinas;
-    this.carboidratosConsumidos += refeicao.carboidratos;
-    this.gordurasConsumidas += refeicao.gorduras;
-
-    this.atualizarDadosDoGrafico();
-
-    console.log('Refeição adicionada!', { consumido: this.caloriasConsumidas, meta: this.caloriasMeta });
-  }
-
   enviarMensagemChat(event: Event) { 
     event.preventDefault();
     const inputElement = (event.target as HTMLFormElement).elements.namedItem('chatInput') as HTMLInputElement;
@@ -140,24 +140,39 @@ export class DashboardComponent implements OnInit {
       inputElement.value = '';
       this.aguardandoResposta = true;
       
-      // Chamar o serviço para enviar ao backend
-      this.authService.questionForIA(mensagem).subscribe({
+      // Determinar nome da refeição baseado no horário
+      const nomeRefeicao = this.determinarNomeRefeicao();
+      
+      // Chamar o serviço para criar a refeição (processa com IA e salva)
+      this.authService.criarRefeicao(mensagem, nomeRefeicao).subscribe({
         next: (resposta) => {
-          // Adicionar resposta da IA ao chat
-          this.mensagensChat.push({
-            texto: resposta,
-            tipo: 'ia',
-            timestamp: new Date()
-          });
-          this.aguardandoResposta = false;
+          if (resposta.sucesso && resposta.refeicao) {
+            // Montar mensagem de resposta formatada
+            const mensagemIA = this.formatarRespostaRefeicao(resposta.refeicao);
+            
+            this.mensagensChat.push({
+              texto: mensagemIA,
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+
+            // Atualizar a lista de refeições e totais
+            this.carregarRefeicoesDeHoje();
+          } else {
+            this.mensagensChat.push({
+              texto: resposta.mensagem || 'Ocorreu um erro ao processar a refeição.',
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+          }
           
-          // Auto-scroll para a última mensagem
+          this.aguardandoResposta = false;
           setTimeout(() => this.scrollToBottom(), 100);
         },
         error: (erro) => {
-          console.error('Erro ao enviar mensagem:', erro);
+          console.error('Erro ao registrar refeição:', erro);
           this.mensagensChat.push({
-            texto: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+            texto: 'Desculpe, ocorreu um erro ao processar sua refeição. Por favor, tente novamente.',
             tipo: 'ia',
             timestamp: new Date()
           });
@@ -165,8 +180,44 @@ export class DashboardComponent implements OnInit {
         }
       });
       
-      // Auto-scroll após adicionar mensagem do usuário
       setTimeout(() => this.scrollToBottom(), 100);
+    }
+  }
+
+  /**
+   * Formata a resposta da refeição para exibir no chat
+   */
+  private formatarRespostaRefeicao(refeicao: RefeicaoDto): string {
+    let mensagem = `✅ Refeição "${refeicao.nomeRef}" registrada com sucesso!\n\n`;
+    
+    mensagem += `📋 Alimentos:\n`;
+    refeicao.alimentos.forEach(alimento => {
+      mensagem += `• ${alimento.descricao} - ${alimento.quantidade}${alimento.unidade}\n`;
+    });
+    
+    mensagem += `\n📊 Totais desta refeição:\n`;
+    mensagem += `• Calorias: ${refeicao.totalCalorias.toFixed(0)} kcal\n`;
+    mensagem += `• Proteínas: ${refeicao.totalProteinas.toFixed(1)}g\n`;
+    mensagem += `• Carboidratos: ${refeicao.totalCarboidratos.toFixed(1)}g\n`;
+    mensagem += `• Gorduras: ${refeicao.totalGorduras.toFixed(1)}g`;
+    
+    return mensagem;
+  }
+
+  /**
+   * Determina o nome da refeição com base no horário
+   */
+  private determinarNomeRefeicao(): string {
+    const hora = new Date().getHours();
+    
+    if (hora >= 5 && hora < 12) {
+      return 'Café da Manhã';
+    } else if (hora >= 12 && hora < 17) {
+      return 'Almoço';
+    } else if (hora >= 17 && hora < 21) {
+      return 'Jantar';
+    } else {
+      return 'Lanche';
     }
   }
 
@@ -185,5 +236,25 @@ export class DashboardComponent implements OnInit {
     };
     
     return mapeamento[objetivo] || 'Objetivo não definido';
+  }
+
+  /**
+   * OPCIONAL: Manter para testes
+   */
+  simularAdicaoRefeicao(): void {
+    const refeicao = {
+      calorias: 450,
+      proteinas: 30,
+      carboidratos: 55,
+      gorduras: 12
+    };
+
+    this.caloriasConsumidas += refeicao.calorias;
+    this.proteinasConsumidas += refeicao.proteinas;
+    this.carboidratosConsumidos += refeicao.carboidratos;
+    this.gordurasConsumidas += refeicao.gorduras;
+
+    this.atualizarDadosDoGrafico();
+    console.log('Refeição simulada adicionada!');
   }
 }
