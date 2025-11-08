@@ -47,6 +47,60 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.carregarDadosUsuario();
     this.carregarRefeicoesDeHoje();
+    this.carregarHistoricoChat();
+  }
+
+  private carregarHistoricoChat(): void {
+    const hoje = new Date().toDateString();
+    const historicoSalvo = localStorage.getItem('chatHistorico');
+    
+    if (historicoSalvo) {
+      try {
+        const dados = JSON.parse(historicoSalvo);
+        
+        // Verificar se o histórico é do dia atual
+        if (dados.data === hoje) {
+          // Converter as strings de timestamp de volta para objetos Date
+          this.mensagensChat = dados.mensagens.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }));
+        } else {
+          // Se for de outro dia, limpar e iniciar nova conversa
+          this.iniciarNovaConversa();
+        }
+      } catch (error) {
+        console.error('Erro ao carregar histórico do chat:', error);
+        this.iniciarNovaConversa();
+      }
+    } else {
+      this.iniciarNovaConversa();
+    }
+  }
+
+  private iniciarNovaConversa(): void {
+    this.mensagensChat = [
+      { 
+        texto: 'Olá! Sou sua assistente NutriTrack. O que você comeu hoje?', 
+        tipo: 'ia',
+        timestamp: new Date()
+      }
+    ];
+    this.salvarHistoricoChat();
+  }
+
+  private salvarHistoricoChat(): void {
+    const hoje = new Date().toDateString();
+    const dadosParaSalvar = {
+      data: hoje,
+      mensagens: this.mensagensChat
+    };
+    
+    try {
+      localStorage.setItem('chatHistorico', JSON.stringify(dadosParaSalvar));
+    } catch (error) {
+      console.error('Erro ao salvar histórico do chat:', error);
+    }
   }
 
   carregarDadosUsuario(): void {
@@ -137,6 +191,7 @@ export class DashboardComponent implements OnInit {
         timestamp: new Date()
       });
       
+      this.salvarHistoricoChat();
       inputElement.value = '';
       this.aguardandoResposta = true;
       
@@ -165,7 +220,8 @@ export class DashboardComponent implements OnInit {
               timestamp: new Date()
             });
           }
-          
+
+          this.salvarHistoricoChat();
           this.aguardandoResposta = false;
           setTimeout(() => this.scrollToBottom(), 100);
         },
@@ -176,6 +232,7 @@ export class DashboardComponent implements OnInit {
             tipo: 'ia',
             timestamp: new Date()
           });
+          this.salvarHistoricoChat();
           this.aguardandoResposta = false;
         }
       });
