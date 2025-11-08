@@ -140,28 +140,31 @@
 
 .progress-bar-container {
   width: 100%;
-  height: 12px;
+  height: 16px;
   background-color: #e9ecef;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .progress-bar {
   height: 100%;
-  border-radius: 6px;
-  transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
-}
-
-.progress-bar-vermelho {
-  background-color: #dc3545;
-}
-
-.progress-bar-amarelo {
-  background-color: var(--cor-primaria);
-}
-
-.progress-bar-verde {
-  background-color: #28a745;
+  border-radius: 8px;
+  transition: width 0.5s ease-in-out, background 0.5s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  // Efeito de brilho na barra
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+    border-radius: 8px 8px 0 0;
+  }
 }
 
 .progresso-texto-calorias {
@@ -169,6 +172,7 @@
   font-size: 0.9rem;
   color: #888;
   margin-top: 0.5rem;
+  font-weight: 500;
 }
 
 // Estilos do Gráfico de Progresso

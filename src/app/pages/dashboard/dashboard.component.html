@@ -14,7 +14,8 @@
           <div 
             class="progress-bar" 
             [style.width.%]="calcularPercentual(caloriasConsumidas, caloriasMeta)"
-            [ngClass]="getBarraCorClasse()"> </div>
+            [style.background]="getCorProgressoCalorias(calcularPercentual(caloriasConsumidas, caloriasMeta))">
+          </div>
         </div>
         <span class="progresso-texto-calorias">{{ caloriasConsumidas | number:'1.0-0' }} / {{ caloriasMeta }} kcal consumidas</span>
       </div>
@@ -77,7 +78,6 @@
       <h3>Progresso de Hoje (Macros Consumidos)</h3>
       
       <div *ngIf="hasConsumedData; else noDataPlaceholder">
-        <!-- GRÁFICO SEM LEGENDA -->
         <div class="chart-wrapper">
           <ngx-charts-pie-chart
             [results]="dadosDoGrafico"
@@ -88,7 +88,6 @@
           </ngx-charts-pie-chart>
         </div>
         
-        <!-- LEGENDA CUSTOMIZADA -->
         <div class="custom-legend">
           <div class="legend-item" *ngFor="let item of dadosDoGrafico">
             <span class="legend-color" [style.background-color]="getCorMacro(item.name)"></span>
@@ -104,37 +103,37 @@
       </ng-template>
     </div>
 
-<div class="card chat-card">
-  <h3>Registre sua Refeição</h3>
-  <p>Descreva o que você comeu. Ex: "1 pão francês com 2 ovos mexidos e 1 copo de café com leite".</p>
-  
-  <div class="chat-window">
-    <div *ngFor="let mensagem of mensagensChat" 
-         [ngClass]="mensagem.tipo === 'usuario' ? 'user-message' : 'gemini-message'">
-      <div class="message-content">{{ mensagem.texto }}</div>
-      <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
-    </div>
-    
-    <div *ngIf="aguardandoResposta" class="gemini-message typing-indicator">
-      <div class="message-content">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
+    <div class="card chat-card">
+      <h3>Registre sua Refeição</h3>
+      <p>Descreva o que você comeu. Ex: "1 pão francês com 2 ovos mexidos e 1 copo de café com leite".</p>
+      
+      <div class="chat-window">
+        <div *ngFor="let mensagem of mensagensChat" 
+            [ngClass]="mensagem.tipo === 'usuario' ? 'user-message' : 'gemini-message'">
+          <div class="message-content">{{ mensagem.texto }}</div>
+          <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+        </div>
+        
+        <div *ngIf="aguardandoResposta" class="gemini-message typing-indicator">
+          <div class="message-content">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
       </div>
+      
+      <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
+        <input 
+          type="text" 
+          name="chatInput" 
+          placeholder="Digite sua refeição aqui..." 
+          autocomplete="off"
+          [disabled]="aguardandoResposta">
+        <button type="submit" [disabled]="aguardandoResposta">
+          {{ aguardandoResposta ? 'Enviando...' : 'Enviar' }}
+        </button>
+      </form>
     </div>
-  </div>
-  
-  <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
-    <input 
-      type="text" 
-      name="chatInput" 
-      placeholder="Digite sua refeição aqui..." 
-      autocomplete="off"
-      [disabled]="aguardandoResposta">
-    <button type="submit" [disabled]="aguardandoResposta">
-      {{ aguardandoResposta ? 'Enviando...' : 'Enviar' }}
-    </button>
-  </form>
-</div>
   </main>
 </div>

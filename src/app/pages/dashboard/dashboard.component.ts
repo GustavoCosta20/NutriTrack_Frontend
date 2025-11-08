@@ -303,4 +303,18 @@ export class DashboardComponent implements OnInit {
     };
     return cores[nomeMacro] || '#95a5a6';
   }
+
+  getCorProgressoCalorias(percentual: number): string {
+    const p = Math.min(Math.max(percentual, 0), 100);
+    
+    if (p < 30) {
+      return 'linear-gradient(90deg, #dc3545, #ff6b6b)';
+    } else if (p < 60) {
+      return 'linear-gradient(90deg, #ffc107, #ffdd57)';
+    } else if (p < 90) {
+      return 'linear-gradient(90deg, #9ccc64, #8bc34a)';
+    } else {
+      return 'linear-gradient(90deg, #28a745, #20c997)';
+    }
+  }
 }
