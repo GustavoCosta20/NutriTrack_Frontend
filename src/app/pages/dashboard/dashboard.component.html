@@ -24,16 +24,51 @@
       <h3>Distribuição de Macros (Metas)</h3>
       <div class="macros-grid">
         <div class="macro-item">
-          <span class="macro-label">Proteínas</span>
-          <span class="macro-valor">{{ proteinasMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Proteínas</span>
+            <span class="macro-valor">{{ proteinasMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-proteinas" 
+                [style.width.%]="calcularPercentual(proteinasConsumidas, proteinasMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+          </div>
         </div>
+
         <div class="macro-item">
-          <span class="macro-label">Carboidratos</span>
-          <span class="macro-valor">{{ carboidratosMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Carboidratos</span>
+            <span class="macro-valor">{{ carboidratosMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-carboidratos" 
+                [style.width.%]="calcularPercentual(carboidratosConsumidos, carboidratosMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+          </div>
         </div>
+
         <div class="macro-item">
-          <span class="macro-label">Gorduras</span>
-          <span class="macro-valor">{{ gordurasMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Gorduras</span>
+            <span class="macro-valor">{{ gordurasMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-gorduras" 
+                [style.width.%]="calcularPercentual(gordurasConsumidas, gordurasMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+          </div>
         </div>
       </div>
     </div>
@@ -41,15 +76,25 @@
     <div class="card progresso-card">
       <h3>Progresso de Hoje (Macros Consumidos)</h3>
       
-      <div *ngIf="hasConsumedData; else noDataPlaceholder" class="chart-container">
-        <ngx-charts-pie-chart
-          [results]="dadosDoGrafico"
-          [customColors]="colorScheme"
-          [doughnut]="true"
-          [legend]="true"
-          [legendTitle]="''"
-          [labels]="true">
-        </ngx-charts-pie-chart>
+      <div *ngIf="hasConsumedData; else noDataPlaceholder">
+        <!-- GRÁFICO SEM LEGENDA -->
+        <div class="chart-wrapper">
+          <ngx-charts-pie-chart
+            [results]="dadosDoGrafico"
+            [customColors]="colorScheme"
+            [doughnut]="true"
+            [legend]="false"
+            [labels]="true">
+          </ngx-charts-pie-chart>
+        </div>
+        
+        <!-- LEGENDA CUSTOMIZADA -->
+        <div class="custom-legend">
+          <div class="legend-item" *ngFor="let item of dadosDoGrafico">
+            <span class="legend-color" [style.background-color]="getCorMacro(item.name)"></span>
+            <span class="legend-text">{{ item.name }}: {{ item.value | number:'1.0-0' }}g</span>
+          </div>
+        </div>
       </div>
 
       <ng-template #noDataPlaceholder>

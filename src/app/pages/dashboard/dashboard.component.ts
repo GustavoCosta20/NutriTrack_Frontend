@@ -238,23 +238,12 @@ export class DashboardComponent implements OnInit {
     return mapeamento[objetivo] || 'Objetivo não definido';
   }
 
-  /**
-   * OPCIONAL: Manter para testes
-   */
-  simularAdicaoRefeicao(): void {
-    const refeicao = {
-      calorias: 450,
-      proteinas: 30,
-      carboidratos: 55,
-      gorduras: 12
+  getCorMacro(nomeMacro: string): string {
+    const cores: { [key: string]: string } = {
+      'Proteínas': '#a8385d',
+      'Carboidratos': '#7aa3e5',
+      'Gorduras': '#a27ea8'
     };
-
-    this.caloriasConsumidas += refeicao.calorias;
-    this.proteinasConsumidas += refeicao.proteinas;
-    this.carboidratosConsumidos += refeicao.carboidratos;
-    this.gordurasConsumidas += refeicao.gorduras;
-
-    this.atualizarDadosDoGrafico();
-    console.log('Refeição simulada adicionada!');
+    return cores[nomeMacro] || '#95a5a6';
   }
 }
