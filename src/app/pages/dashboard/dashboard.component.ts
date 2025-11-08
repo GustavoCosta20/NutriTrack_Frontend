@@ -212,9 +212,9 @@ export class DashboardComponent implements OnInit {
     
     if (hora >= 5 && hora < 12) {
       return 'Café da Manhã';
-    } else if (hora >= 12 && hora < 17) {
+    } else if (hora >= 12 && hora < 14) {
       return 'Almoço';
-    } else if (hora >= 17 && hora < 21) {
+    } else if (hora >= 19 && hora < 21) {
       return 'Jantar';
     } else {
       return 'Lanche';

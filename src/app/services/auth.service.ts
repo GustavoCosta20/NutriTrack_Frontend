@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { LoginUser } from '../models/login-user.model'; 
 import { tap } from 'rxjs';
 import { UserProfileDto } from '../models/user.model';
-import { CriarRefeicaoRequest, CriarRefeicaoResponse, RefeicoesDoHojeResponse } from '../models/snack.model';
+import { CriarRefeicaoRequest, CriarRefeicaoResponse, RefeicaoDto, RefeicoesDoHojeResponse } from '../models/snack.model';
 
 @Injectable({
   providedIn: 'root'
@@ -97,5 +97,19 @@ export class AuthService {
       `${this.apiUrl}/refeicao/hoje`, 
       { headers }
     );
+  }
+
+  obterRefeicoes(data?: string): Observable<RefeicaoDto[]> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    let url = `${this.apiUrl}/refeicao`;
+    if (data) {
+      url += `?data=${data}`;
+    }
+
+    return this.http.get<RefeicaoDto[]>(url, { headers });
   }
 }

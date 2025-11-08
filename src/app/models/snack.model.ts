@@ -25,6 +25,19 @@ export interface CriarRefeicaoRequest {
   nomeRefeicao: string;
 }
 
+export interface Refeicao {
+  nome: string;
+  alimentos: { descricao: string; calorias: number }[];
+  totalCalorias: number;
+}
+
+export interface RegistroDiario {
+  data: Date;
+  refeicoes: Refeicao[];
+  totalCaloriasDia: number;
+  isHoje?: boolean;
+}
+
 export interface CriarRefeicaoResponse {
   sucesso: boolean;
   mensagem: string;

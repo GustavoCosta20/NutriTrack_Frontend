@@ -13,4 +13,5 @@ export interface RegistroDiario {
   data: Date;
   refeicoes: Refeicao[];
   totalCaloriasDia: number;
+  isHoje?: boolean;
 }

@@ -1,35 +1,51 @@
 <div class="history-container">
   <header class="history-header">
     <h2>Histórico de Refeições</h2>
-    <p>Acompanhe seu progresso nas últimas duas semanas.</p>
+    <p>Acompanhe seu progresso nas últimas semanas.</p>
   </header>
 
-  <div class="accordion">
+  <!-- Loading State -->
+  <div *ngIf="carregando" class="loading-state">
+    <p>Carregando histórico...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="erro && !carregando" class="error-state">
+    <p>{{ erro }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!carregando && !erro && historico.length === 0" class="empty-state">
+    <p>Nenhuma refeição registrada ainda.</p>
+    <p>Comece adicionando sua primeira refeição!</p>
+  </div>
+
+  <!-- Accordion com dados -->
+  <div class="accordion" *ngIf="!carregando && !erro && historico.length > 0">
     <div *ngFor="let dia of historico; let i = index" class="accordion-item">
 
       <div class="accordion-header" (click)="toggleDia(i)">
         <span class="header-date">
-          {{ dia.data | date:'fullDate' }}
-          <strong *ngIf="i === 0">(Hoje)</strong>
+          {{ dia.data | date:'fullDate':'':'pt-BR' }}
+          <strong *ngIf="dia.isHoje">(Hoje)</strong>
         </span>
         <span class="header-summary">
-          Total: <strong>{{ dia.totalCaloriasDia }} kcal</strong>
+          Total: <strong>{{ dia.totalCaloriasDia | number:'1.0-0' }} kcal</strong>
           <span class="caret" [class.open]="diaExpandido === i"></span>
         </span>
       </div>
 
       <div class="accordion-content" *ngIf="diaExpandido === i">
         <div *ngFor="let refeicao of dia.refeicoes" class="meal-card">
-          <h4>{{ refeicao.nome }} - {{ refeicao.totalCalorias }} kcal</h4>
+          <h4>{{ refeicao.nome }} - {{ refeicao.totalCalorias | number:'1.0-0' }} kcal</h4>
           <ul>
             <li *ngFor="let alimento of refeicao.alimentos">
               <span>{{ alimento.descricao }}</span>
-              <span>{{ alimento.calorias }} kcal</span>
+              <span>{{ alimento.calorias | number:'1.0-0' }} kcal</span>
             </li>
           </ul>
         </div>
       </div>
-
     </div>
   </div>
 </div>
