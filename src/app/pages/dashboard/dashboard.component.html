@@ -104,8 +104,70 @@
     </div>
 
     <div class="card chat-card">
-      <h3>Registre sua Refeição</h3>
-      <p>Descreva o que você comeu. Ex: "1 pão francês com 2 ovos mexidos e 1 copo de café com leite".</p>
+      <div class="chat-header">
+        <h3>Registre sua Refeição</h3>
+        <div class="chat-actions">
+          <button 
+            type="button" 
+            class="btn-icon" 
+            (click)="toggleHistoricoChat()"
+            title="Ver histórico">
+            📅
+          </button>
+          <button 
+            type="button" 
+            class="btn-icon" 
+            (click)="limparConversa()"
+            title="Limpar conversa">
+            🗑️
+          </button>
+        </div>
+      </div>
+      
+      <p class="chat-description">Descreva o que você comeu. Ex: "almoço, 200g de arroz, 150g de frango e salada".</p>
+      
+      <!-- Modal de Histórico -->
+      <div class="historico-modal" *ngIf="mostrarHistorico">
+        <div class="historico-overlay" (click)="toggleHistoricoChat()"></div>
+        <div class="historico-content">
+          <div class="historico-header">
+            <h4>Histórico de Conversas</h4>
+            <button type="button" class="btn-close" (click)="toggleHistoricoChat()">✕</button>
+          </div>
+          
+          <div class="historico-body">
+            <div *ngIf="historicoConversas.length === 0" class="historico-vazio">
+              <p>Nenhum histórico encontrado</p>
+            </div>
+            
+            <div 
+              *ngFor="let hist of historicoConversas" 
+              class="historico-item"
+              (click)="carregarHistoricoDia(hist.data)">
+              <div class="historico-data">
+                {{ formatarDataHistorico(hist.data) }}
+              </div>
+              <div class="historico-preview">
+                {{ hist.mensagens.length }} mensagens
+              </div>
+              <div class="historico-actions">
+                <button 
+                  type="button" 
+                  class="btn-carregar"
+                  (click)="carregarHistoricoDia(hist.data); $event.stopPropagation()">
+                  Carregar
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-deletar"
+                  (click)="deletarHistoricoDia(hist.data); $event.stopPropagation()">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="chat-window">
         <div *ngFor="let mensagem of mensagensChat" 
@@ -136,4 +198,15 @@
       </form>
     </div>
   </main>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarConfirmacao">
+  <div class="modal-content">
+    <h3>{{ tituloConfirmacao }}</h3>
+    <p>{{ mensagemConfirmacao }}</p>
+    <div class="modal-buttons">
+      <button class="btn-cancelar" (click)="cancelarConfirmacao()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarAcao()">Sim, confirmar</button>
+    </div>
+  </div>
 </div>

@@ -2,6 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { RefeicaoDto } from 'src/app/models/snack.model';
 
+interface HistoricoChat {
+  data: string;
+  mensagens: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }>;
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -31,16 +36,17 @@ export class DashboardComponent implements OnInit {
     domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
   };
 
-  //Propriedades do Chat
-  mensagensChat: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }> = [
-    { 
-      texto: 'Olá! Sou sua assistente NutriTrack. Descreva o que você comeu para eu registrar sua refeição. Ex: "2 ovos mexidos, 1 pão francês e 1 copo de café com leite"', 
-      tipo: 'ia',
-      timestamp: new Date()
-    }
-  ];
-
+  // Propriedades do Chat
+  mensagensChat: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }> = [];
   aguardandoResposta = false;
+  
+  // NOVO: Propriedades do histórico
+  mostrarHistorico = false;
+  historicoConversas: HistoricoChat[] = [];
+  mostrarConfirmacao = false;
+  tituloConfirmacao = '';
+  mensagemConfirmacao = '';
+  acaoConfirmacao: (() => void) | null = null;
 
   constructor(private authService: AuthService) { }
 
@@ -48,40 +54,35 @@ export class DashboardComponent implements OnInit {
     this.carregarDadosUsuario();
     this.carregarRefeicoesDeHoje();
     this.carregarHistoricoChat();
+    this.carregarListaHistoricos();
   }
 
+  // ==================== MÉTODOS DE HISTÓRICO ====================
+
+  /**
+   * Carrega o histórico do dia atual
+   */
   private carregarHistoricoChat(): void {
-    const hoje = new Date().toDateString();
-    const historicoSalvo = localStorage.getItem('chatHistorico');
+    const hoje = this.obterDataAtual();
+    const historicoHoje = this.obterHistoricoPorData(hoje);
     
-    if (historicoSalvo) {
-      try {
-        const dados = JSON.parse(historicoSalvo);
-        
-        // Verificar se o histórico é do dia atual
-        if (dados.data === hoje) {
-          // Converter as strings de timestamp de volta para objetos Date
-          this.mensagensChat = dados.mensagens.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp)
-          }));
-        } else {
-          // Se for de outro dia, limpar e iniciar nova conversa
-          this.iniciarNovaConversa();
-        }
-      } catch (error) {
-        console.error('Erro ao carregar histórico do chat:', error);
-        this.iniciarNovaConversa();
-      }
+    if (historicoHoje && historicoHoje.mensagens.length > 0) {
+      this.mensagensChat = historicoHoje.mensagens.map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      }));
     } else {
       this.iniciarNovaConversa();
     }
   }
 
+  /**
+   * Inicia uma nova conversa
+   */
   private iniciarNovaConversa(): void {
     this.mensagensChat = [
       { 
-        texto: 'Olá! Sou sua assistente NutriTrack. O que você comeu hoje?', 
+        texto: 'Olá! Sou sua assistente NutriTrack. Descreva o que você comeu. Ex: "almoço, 200g de arroz e 150g de frango"', 
         tipo: 'ia',
         timestamp: new Date()
       }
@@ -89,19 +90,217 @@ export class DashboardComponent implements OnInit {
     this.salvarHistoricoChat();
   }
 
+  /**
+   * Salva o histórico do chat atual
+   */
   private salvarHistoricoChat(): void {
-    const hoje = new Date().toDateString();
-    const dadosParaSalvar = {
+    const hoje = this.obterDataAtual();
+    const chaveStorage = this.gerarChaveStorage(hoje);
+    
+    const dadosParaSalvar: HistoricoChat = {
       data: hoje,
       mensagens: this.mensagensChat
     };
     
     try {
-      localStorage.setItem('chatHistorico', JSON.stringify(dadosParaSalvar));
+      localStorage.setItem(chaveStorage, JSON.stringify(dadosParaSalvar));
+      this.atualizarListaHistoricos(hoje);
     } catch (error) {
       console.error('Erro ao salvar histórico do chat:', error);
     }
   }
+
+  /**
+   * Carrega a lista de todos os históricos salvos
+   */
+  private carregarListaHistoricos(): void {
+    try {
+      const listaHistoricos = localStorage.getItem('chatHistoricoLista');
+      if (listaHistoricos) {
+        const datas: string[] = JSON.parse(listaHistoricos);
+        
+        this.historicoConversas = datas
+          .map(data => this.obterHistoricoPorData(data))
+          .filter(hist => hist !== null) as HistoricoChat[];
+        
+        // Ordena do mais recente para o mais antigo
+        this.historicoConversas.sort((a, b) => 
+          new Date(b.data).getTime() - new Date(a.data).getTime()
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao carregar lista de históricos:', error);
+    }
+  }
+
+  /**
+   * Atualiza a lista de históricos com uma nova data
+   */
+  private atualizarListaHistoricos(novaData: string): void {
+    try {
+      const listaHistoricos = localStorage.getItem('chatHistoricoLista');
+      let datas: string[] = listaHistoricos ? JSON.parse(listaHistoricos) : [];
+      
+      if (!datas.includes(novaData)) {
+        datas.push(novaData);
+        localStorage.setItem('chatHistoricoLista', JSON.stringify(datas));
+      }
+      
+      this.carregarListaHistoricos();
+    } catch (error) {
+      console.error('Erro ao atualizar lista de históricos:', error);
+    }
+  }
+
+  /**
+   * Obtém histórico de uma data específica
+   */
+  private obterHistoricoPorData(data: string): HistoricoChat | null {
+    try {
+      const chave = this.gerarChaveStorage(data);
+      const historico = localStorage.getItem(chave);
+      return historico ? JSON.parse(historico) : null;
+    } catch (error) {
+      console.error('Erro ao obter histórico:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Gera a chave de storage para uma data
+   */
+  private gerarChaveStorage(data: string): string {
+    return `chatHistorico_${data}`;
+  }
+
+  /**
+   * Obtém a data atual no formato YYYY-MM-DD
+   */
+  private obterDataAtual(): string {
+    const hoje = new Date();
+    return hoje.toISOString().split('T')[0];
+  }
+
+  /**
+   * Formata a data para exibição no histórico
+   */
+  formatarDataHistorico(data: string): string {
+    const hoje = this.obterDataAtual();
+    const ontem = new Date();
+    ontem.setDate(ontem.getDate() - 1);
+    const dataOntem = ontem.toISOString().split('T')[0];
+    
+    if (data === hoje) {
+      return 'Hoje';
+    } else if (data === dataOntem) {
+      return 'Ontem';
+    } else {
+      const partes = data.split('-');
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+  }
+
+  /**
+   * Toggle do modal de histórico
+   */
+  toggleHistoricoChat(): void {
+    this.mostrarHistorico = !this.mostrarHistorico;
+    if (this.mostrarHistorico) {
+      this.carregarListaHistoricos();
+    }
+  }
+
+  /**
+   * Carrega o histórico de um dia específico
+   */
+  carregarHistoricoDia(data: string): void {
+    const historico = this.obterHistoricoPorData(data);
+    
+    if (historico) {
+      this.mensagensChat = historico.mensagens.map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      }));
+      
+      this.mostrarHistorico = false;
+      
+      setTimeout(() => this.scrollToBottom(), 100);
+    }
+  }
+
+  deletarHistoricoDia(data: string): void {
+    const dataFormatada = this.formatarDataHistorico(data);
+
+    this.abrirConfirmacao(
+      'Excluir histórico',
+      `Deseja realmente excluir o histórico de ${dataFormatada}?`,
+      () => {
+        try {
+          const chave = this.gerarChaveStorage(data);
+          localStorage.removeItem(chave);
+
+          // Remove da lista de históricos
+          const listaHistoricos = localStorage.getItem('chatHistoricoLista');
+          if (listaHistoricos) {
+            let datas: string[] = JSON.parse(listaHistoricos);
+            datas = datas.filter(d => d !== data);
+            localStorage.setItem('chatHistoricoLista', JSON.stringify(datas));
+          }
+
+          // Se deletou o histórico de hoje, inicia nova conversa
+          if (data === this.obterDataAtual()) {
+            this.iniciarNovaConversa();
+          }
+
+          this.carregarListaHistoricos();
+        } catch (error) {
+          console.error('Erro ao deletar histórico:', error);
+        }
+      }
+    );
+  }
+
+  limparConversa(): void {
+    this.abrirConfirmacao(
+      'Limpar conversa',
+      'Deseja realmente limpar esta conversa? Esta ação não pode ser desfeita.',
+      () => {
+        this.iniciarNovaConversa();
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+    );
+  }
+
+  cancelarLimpeza(): void {
+    this.mostrarConfirmacao = false;
+  }
+
+  confirmarLimpeza(): void {
+    this.mostrarConfirmacao = false;
+    this.iniciarNovaConversa();
+    setTimeout(() => this.scrollToBottom(), 100);
+  }
+
+  abrirConfirmacao(titulo: string, mensagem: string, acao: () => void): void {
+    this.tituloConfirmacao = titulo;
+    this.mensagemConfirmacao = mensagem;
+    this.acaoConfirmacao = acao;
+    this.mostrarConfirmacao = true;
+  }
+
+  cancelarConfirmacao(): void {
+    this.mostrarConfirmacao = false;
+    this.tituloConfirmacao = '';
+    this.mensagemConfirmacao = '';
+    this.acaoConfirmacao = null;
+  }
+
+  confirmarAcao(): void {
+    if (this.acaoConfirmacao) this.acaoConfirmacao();
+    this.cancelarConfirmacao();
+  }
+
+  // ==================== MÉTODOS EXISTENTES ====================
 
   carregarDadosUsuario(): void {
     this.authService.getUserProfile().subscribe({
@@ -125,7 +324,6 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         this.refeicoesDeHoje = response.refeicoes;
         
-        // Atualiza os totais consumidos
         this.caloriasConsumidas = response.totais.calorias;
         this.proteinasConsumidas = response.totais.proteinas;
         this.carboidratosConsumidos = response.totais.carboidratos;
@@ -175,16 +373,12 @@ export class DashboardComponent implements OnInit {
     return Math.min(percentual, 100);
   }
 
-  /**
-   * NOVO: Enviar mensagem e criar refeição
-   */
   enviarMensagemChat(event: Event) { 
     event.preventDefault();
     const inputElement = (event.target as HTMLFormElement).elements.namedItem('chatInput') as HTMLInputElement;
     const mensagem = inputElement.value;
     
     if (mensagem.trim() && !this.aguardandoResposta) {
-      // Adicionar mensagem do usuário ao chat
       this.mensagensChat.push({
         texto: mensagem,
         tipo: 'usuario',
@@ -195,11 +389,9 @@ export class DashboardComponent implements OnInit {
       inputElement.value = '';
       this.aguardandoResposta = true;
       
-      // Chamar o serviço para criar a refeição (processa com IA e salva)
       this.authService.criarRefeicao(mensagem, '').subscribe({
         next: (resposta) => {
           if (resposta.sucesso && resposta.refeicao) {
-            // Montar mensagem de resposta formatada
             const mensagemIA = this.formatarRespostaRefeicao(resposta.refeicao);
             
             this.mensagensChat.push({
@@ -208,10 +400,8 @@ export class DashboardComponent implements OnInit {
               timestamp: new Date()
             });
 
-            // Atualizar a lista de refeições e totais
             this.carregarRefeicoesDeHoje();
           } else {
-            // MUDANÇA: Agora trata mensagens de erro de validação
             this.mensagensChat.push({
               texto: resposta.mensagem || 'Ocorreu um erro ao processar a refeição.',
               tipo: 'ia',
@@ -226,11 +416,9 @@ export class DashboardComponent implements OnInit {
         error: (erro) => {
           console.error('Erro ao registrar refeição:', erro);
           
-          // MUDANÇA: Verifica se é erro de validação (400 Bad Request)
           let mensagemErro = 'Desculpe, ocorreu um erro ao processar sua refeição. Por favor, tente novamente.';
           
           if (erro.status === 400 && erro.error?.mensagem) {
-            // Erro de validação - mostra a mensagem específica
             mensagemErro = erro.error.mensagem;
           }
           
@@ -250,9 +438,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Formata a resposta da refeição para exibir no chat
-   */
   private formatarRespostaRefeicao(refeicao: RefeicaoDto): string {
     let mensagem = `✅ Refeição "${refeicao.nomeRef}" registrada com sucesso!\n\n`;
     
