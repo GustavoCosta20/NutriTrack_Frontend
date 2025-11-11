@@ -195,11 +195,8 @@ export class DashboardComponent implements OnInit {
       inputElement.value = '';
       this.aguardandoResposta = true;
       
-      // Determinar nome da refeição baseado no horário
-      const nomeRefeicao = this.determinarNomeRefeicao();
-      
       // Chamar o serviço para criar a refeição (processa com IA e salva)
-      this.authService.criarRefeicao(mensagem, nomeRefeicao).subscribe({
+      this.authService.criarRefeicao(mensagem, '').subscribe({
         next: (resposta) => {
           if (resposta.sucesso && resposta.refeicao) {
             // Montar mensagem de resposta formatada
@@ -214,6 +211,7 @@ export class DashboardComponent implements OnInit {
             // Atualizar a lista de refeições e totais
             this.carregarRefeicoesDeHoje();
           } else {
+            // MUDANÇA: Agora trata mensagens de erro de validação
             this.mensagensChat.push({
               texto: resposta.mensagem || 'Ocorreu um erro ao processar a refeição.',
               tipo: 'ia',
@@ -227,13 +225,24 @@ export class DashboardComponent implements OnInit {
         },
         error: (erro) => {
           console.error('Erro ao registrar refeição:', erro);
+          
+          // MUDANÇA: Verifica se é erro de validação (400 Bad Request)
+          let mensagemErro = 'Desculpe, ocorreu um erro ao processar sua refeição. Por favor, tente novamente.';
+          
+          if (erro.status === 400 && erro.error?.mensagem) {
+            // Erro de validação - mostra a mensagem específica
+            mensagemErro = erro.error.mensagem;
+          }
+          
           this.mensagensChat.push({
-            texto: 'Desculpe, ocorreu um erro ao processar sua refeição. Por favor, tente novamente.',
+            texto: mensagemErro,
             tipo: 'ia',
             timestamp: new Date()
           });
+          
           this.salvarHistoricoChat();
           this.aguardandoResposta = false;
+          setTimeout(() => this.scrollToBottom(), 100);
         }
       });
       
@@ -259,23 +268,6 @@ export class DashboardComponent implements OnInit {
     mensagem += `• Gorduras: ${refeicao.totalGorduras.toFixed(1)}g`;
     
     return mensagem;
-  }
-
-  /**
-   * Determina o nome da refeição com base no horário
-   */
-  private determinarNomeRefeicao(): string {
-    const hora = new Date().getHours();
-    
-    if (hora >= 5 && hora < 12) {
-      return 'Café da Manhã';
-    } else if (hora >= 12 && hora < 14) {
-      return 'Almoço';
-    } else if (hora >= 19 && hora < 21) {
-      return 'Jantar';
-    } else {
-      return 'Lanche';
-    }
   }
 
   private scrollToBottom(): void {

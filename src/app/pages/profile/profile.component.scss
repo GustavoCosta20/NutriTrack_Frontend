@@ -102,10 +102,6 @@
   }
 }
 
-.profile-edit {
-  // Cole aqui os estilos .form-group, etc. que você já tem
-}
-
 .page-wrapper {
   min-height: 100vh;
   background: linear-gradient(135deg, #ead626 0%, #f4e65c 100%);
@@ -353,6 +349,61 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.form-group input.invalid,
+.form-group select.invalid {
+  border-color: #fc8181;
+  background-color: #fff5f5;
+}
+
+.error-message {
+  display: block;
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+// NOVO: Mensagem de erro geral (aparece no topo do form)
+.form-error-message {
+  background: #fff5f5;
+  border: 2px solid #fc8181;
+  color: #c53030;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  &::before {
+    content: "⚠️";
+    font-size: 1.25rem;
+  }
+}
+
+// NOVO: Mensagem de sucesso
+.form-success-message {
+  background: #f0fff4;
+  border: 2px solid #9ae6b4;
+  color: #276749;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  &::before {
+    content: "✅";
+    font-size: 1.25rem;
+  }
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

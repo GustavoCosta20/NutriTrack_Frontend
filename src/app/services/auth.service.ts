@@ -68,7 +68,7 @@ export class AuthService {
     });
   }
 
-  criarRefeicao(descricaoRefeicao: string, nomeRefeicao: string = 'Refeição'): Observable<CriarRefeicaoResponse> {
+  criarRefeicao(descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
     const request: CriarRefeicaoRequest = {
       descricaoRefeicao,
       nomeRefeicao
