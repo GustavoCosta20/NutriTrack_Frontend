@@ -1,88 +1,126 @@
-<div class="register-container">
+<div class="page-wrapper">
+  <div class="register-container">
+    
+    <header class="register-header">
+      <div class="logo-container">
+        <img src="assets/images/logo.png" alt="Logo do NutriTrack">
+      </div>
+      <h2>Crie sua Conta</h2>
+      <p>Preencha os campos abaixo para começar a monitorar sua nutrição</p>
+    </header>
 
-  <div class="logo-container">
-    <img src="assets/images/logo.png" alt="Logo do NutriTrack">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      
+      <!-- Mensagem de erro geral -->
+      <div class="form-error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-group">
+        <label for="nome">Nome Completo *</label>
+        <input 
+          type="text" 
+          id="nome" 
+          formControlName="nomeCompleto"
+          placeholder="Digite seu nome completo"
+          [class.invalid]="registerForm.get('nomeCompleto')?.invalid && registerForm.get('nomeCompleto')?.touched">
+        <span class="error-message" *ngIf="registerForm.get('nomeCompleto')?.invalid && registerForm.get('nomeCompleto')?.touched">
+          Nome é obrigatório e precisa ter no mínimo 3 caracteres
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail *</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          placeholder="seu@email.com"
+          [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+        <span class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          Por favor, insira um e-mail válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha *</label>
+        <input 
+          type="password" 
+          id="senha" 
+          formControlName="senha"
+          placeholder="Mínimo 8 caracteres"
+          [class.invalid]="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched">
+        <span class="error-message" *ngIf="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched">
+          A senha é obrigatória e precisa ter no mínimo 8 caracteres
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="dataNascimento">Data de Nascimento *</label>
+        <input 
+          type="date" 
+          id="dataNascimento" 
+          formControlName="dataNascimento">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="altura">Altura (cm) *</label>
+          <input 
+            type="number" 
+            id="altura" 
+            formControlName="alturaEmCm"
+            placeholder="Ex: 170">
+        </div>
+
+        <div class="form-group">
+          <label for="peso">Peso (Kg) *</label>
+          <input 
+            type="number" 
+            id="peso" 
+            formControlName="pesoEmKg"
+            placeholder="Ex: 70">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Gênero *</label>
+        <div class="radio-group">
+          <label class="radio-option" *ngFor="let g of generos">
+            <input type="radio" [value]="g.valor" formControlName="genero">
+            <span class="radio-label">{{ g.texto }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nivelAtividade">Nível de Atividade Física *</label>
+        <select id="nivelAtividade" formControlName="nivelDeAtividade">
+          <option [ngValue]="null" disabled>Selecione seu nível de atividade</option>
+          <option *ngFor="let nivel of niveisAtividade" [ngValue]="nivel.valor">
+            {{ nivel.texto }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="objetivo">Seu Principal Objetivo *</label>
+        <select id="objetivo" formControlName="objetivo">
+          <option [ngValue]="null" disabled>Selecione seu objetivo</option>
+          <option *ngFor="let obj of objetivos" [ngValue]="obj.valor">
+            {{ obj.texto }}
+          </option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="registerForm.invalid">
+        Criar Conta
+      </button>
+
+      <p class="login-link">
+        Já tem uma conta? <a routerLink="/login">Fazer login</a>
+      </p>
+    </form>
+    
   </div>
-
-  <h2>Crie sua Conta no NutriTrack</h2>
-  <p>Preencha os campos abaixo para começar a monitorar sua nutrição.</p>
-
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-
-    <div class="form-group">
-      <label for="nome">Nome Completo:</label>
-      <input type="text" id="nome" formControlName="nomeCompleto">
-      <div *ngIf="registerForm.get('nomeCompleto')?.invalid && registerForm.get('nomeCompleto')?.touched" class="error-message">
-        Nome é obrigatório e precisa ter no mínimo 3 caracteres.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="email">E-mail:</label>
-      <input type="email" id="email" formControlName="email">
-       <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-message">
-        Por favor, insira um e-mail válido.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="senha">Senha:</label>
-      <input type="password" id="senha" formControlName="senha">
-      <div *ngIf="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched" class="error-message">
-        A senha é obrigatória e precisa ter no mínimo 8 caracteres.
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="dataNascimento">Data de Nascimento:</label>
-      <input type="date" id="dataNascimento" formControlName="dataNascimento">
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="altura">Altura (cm):</label>
-        <input type="number" id="altura" formControlName="alturaEmCm">
-      </div>
-
-      <div class="form-group">
-        <label for="peso">Peso (Kg):</label>
-        <input type="number" id="peso" formControlName="pesoEmKg">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Gênero:</label>
-      <div class="radio-group">
-        <label *ngFor="let g of generos">
-          <input type="radio" [value]="g.valor" formControlName="genero"> {{ g.texto }}
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="nivelAtividade">Nível de Atividade Física:</label>
-      <select id="nivelAtividade" formControlName="nivelDeAtividade">
-        <option [ngValue]="null" disabled>Selecione uma opção</option>
-        <option *ngFor="let nivel of niveisAtividade" [ngValue]="nivel.valor">
-          {{ nivel.texto }}
-        </option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="objetivo">Seu Principal Objetivo:</label>
-      <select id="objetivo" formControlName="objetivo">
-        <option [ngValue]="null" disabled>Selecione uma opção</option>
-        <option *ngFor="let obj of objetivos" [ngValue]="obj.valor">
-          {{ obj.texto }}
-        </option>
-      </select>
-    </div>
-
-    <div *ngIf="errorMessage" class="error-message-geral">
-      {{ errorMessage }}
-    </div>
-
-    <button type="submit" [disabled]="registerForm.invalid">Criar Conta</button>
-  </form>
 </div>
