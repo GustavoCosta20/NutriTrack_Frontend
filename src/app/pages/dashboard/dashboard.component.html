@@ -14,7 +14,8 @@
           <div 
             class="progress-bar" 
             [style.width.%]="calcularPercentual(caloriasConsumidas, caloriasMeta)"
-            [ngClass]="getBarraCorClasse()"> </div>
+            [style.background]="getCorProgressoCalorias(calcularPercentual(caloriasConsumidas, caloriasMeta))">
+          </div>
         </div>
         <span class="progresso-texto-calorias">{{ caloriasConsumidas | number:'1.0-0' }} / {{ caloriasMeta }} kcal consumidas</span>
       </div>
@@ -24,16 +25,51 @@
       <h3>Distribuição de Macros (Metas)</h3>
       <div class="macros-grid">
         <div class="macro-item">
-          <span class="macro-label">Proteínas</span>
-          <span class="macro-valor">{{ proteinasMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Proteínas</span>
+            <span class="macro-valor">{{ proteinasMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-proteinas" 
+                [style.width.%]="calcularPercentual(proteinasConsumidas, proteinasMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+          </div>
         </div>
+
         <div class="macro-item">
-          <span class="macro-label">Carboidratos</span>
-          <span class="macro-valor">{{ carboidratosMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Carboidratos</span>
+            <span class="macro-valor">{{ carboidratosMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-carboidratos" 
+                [style.width.%]="calcularPercentual(carboidratosConsumidos, carboidratosMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+          </div>
         </div>
+
         <div class="macro-item">
-          <span class="macro-label">Gorduras</span>
-          <span class="macro-valor">{{ gordurasMeta }}g</span>
+          <div class="macro-header">
+            <span class="macro-label">Gorduras</span>
+            <span class="macro-valor">{{ gordurasMeta }}g</span>
+          </div>
+          <div class="macro-progress-wrapper">
+            <div class="macro-progress-bar-container">
+              <div 
+                class="macro-progress-bar macro-progress-gorduras" 
+                [style.width.%]="calcularPercentual(gordurasConsumidas, gordurasMeta)">
+              </div>
+            </div>
+            <span class="macro-progress-text">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+          </div>
         </div>
       </div>
     </div>
@@ -41,15 +77,23 @@
     <div class="card progresso-card">
       <h3>Progresso de Hoje (Macros Consumidos)</h3>
       
-      <div *ngIf="hasConsumedData; else noDataPlaceholder" class="chart-container">
-        <ngx-charts-pie-chart
-          [results]="dadosDoGrafico"
-          [customColors]="colorScheme"
-          [doughnut]="true"
-          [legend]="true"
-          [legendTitle]="''"
-          [labels]="true">
-        </ngx-charts-pie-chart>
+      <div *ngIf="hasConsumedData; else noDataPlaceholder">
+        <div class="chart-wrapper">
+          <ngx-charts-pie-chart
+            [results]="dadosDoGrafico"
+            [customColors]="colorScheme"
+            [doughnut]="true"
+            [legend]="false"
+            [labels]="true">
+          </ngx-charts-pie-chart>
+        </div>
+        
+        <div class="custom-legend">
+          <div class="legend-item" *ngFor="let item of dadosDoGrafico">
+            <span class="legend-color" [style.background-color]="getCorMacro(item.name)"></span>
+            <span class="legend-text">{{ item.name }}: {{ item.value | number:'1.0-0' }}g</span>
+          </div>
+        </div>
       </div>
 
       <ng-template #noDataPlaceholder>
@@ -57,22 +101,132 @@
           <p>Registre sua primeira refeição para ver o progresso do seu dia!</p>
         </div>
       </ng-template>
-      
-      <button (click)="simularAdicaoRefeicao()" class="btn-simular">Simular Adição de Refeição</button>
     </div>
 
     <div class="card chat-card">
-      <h3>Registre sua Refeição</h3>
-      <p>Descreva o que você comeu. Ex: "1 pão francês com 2 ovos mexidos e 1 copo de café com leite".</p>
-      
-      <div class="chat-window">
-        <div class="gemini-message">Olá! Sou sua assistente NutriTrack. O que você comeu hoje?</div>
+      <div class="chat-header">
+        <h3>Registre sua Refeição</h3>
+        <div class="chat-actions">
+          <button 
+            type="button" 
+            class="btn-icon" 
+            (click)="toggleHistoricoChat()"
+            title="Ver histórico">
+            📅
+          </button>
+          <button 
+            type="button" 
+            class="btn-icon" 
+            (click)="limparConversa()"
+            title="Limpar conversa">
+            🗑️
+          </button>
+        </div>
       </div>
       
+      <p class="chat-description">Descreva o que você comeu. Ex: "almoço, 200g de arroz, 150g de frango e salada".</p>
+    
+      <div class="historico-modal" *ngIf="mostrarHistorico">
+        <div class="historico-overlay" (click)="toggleHistoricoChat()"></div>
+        <div class="historico-content">
+          <div class="historico-header">
+            <h4>Histórico de Conversas</h4>
+            <button type="button" class="btn-close" (click)="toggleHistoricoChat()">✕</button>
+          </div>
+          
+          <div class="historico-body">
+            <div *ngIf="historicoConversas.length === 0" class="historico-vazio">
+              <p>Nenhum histórico encontrado</p>
+            </div>
+            
+            <div 
+              *ngFor="let hist of historicoConversas" 
+              class="historico-item"
+              (click)="carregarHistoricoDia(hist.data)">
+              <div class="historico-data">
+                {{ formatarDataHistorico(hist.data) }}
+              </div>
+              <div class="historico-preview">
+                {{ hist.mensagens.length }} mensagens
+              </div>
+              <div class="historico-actions">
+                <button 
+                  type="button" 
+                  class="btn-carregar"
+                  (click)="carregarHistoricoDia(hist.data); $event.stopPropagation()">
+                  Carregar
+                </button>
+                <button 
+                  type="button" 
+                  class="btn-deletar"
+                  (click)="deletarHistoricoDia(hist.data); $event.stopPropagation()">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-window">
+        <div *ngFor="let mensagem of mensagensChat" 
+            [ngClass]="mensagem.tipo === 'usuario' ? 'user-message' : 'gemini-message'">
+          <div class="message-content">{{ mensagem.texto }}</div>
+          <div class="message-footer">
+            <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+            <div class="message-actions" *ngIf="mensagem.podEditar && mensagem.tipo === 'ia'">
+              <button 
+                class="btn-editar"
+                (click)="iniciarEdicaoRefeicao(mensagem)"
+                title="Editar refeição">
+                ✏️
+              </button>
+              <button 
+                class="btn-excluir"
+                (click)="excluirRefeicao(mensagem)"
+                title="Excluir refeição">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="aguardandoResposta" class="gemini-message typing-indicator">
+          <div class="message-content">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="editing-banner" *ngIf="mensagemEditando">
+        <span class="editing-text">✏️ Editando refeição</span>
+        <button class="btn-cancelar-edicao" (click)="cancelarEdicao()">✕ Cancelar</button>
+      </div>
+
       <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
-        <input type="text" name="chatInput" placeholder="Digite sua refeição aqui..." autocomplete="off">
-        <button type="submit">Enviar</button>
+        <input 
+          type="text" 
+          name="chatInput" 
+          placeholder="Digite sua refeição aqui..." 
+          autocomplete="off"
+          [disabled]="aguardandoResposta">
+        <button type="submit" [disabled]="aguardandoResposta">
+          {{ aguardandoResposta ? 'Enviando...' : (mensagemEditando ? 'Atualizar' : 'Enviar') }}
+        </button>
       </form>
     </div>
   </main>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarConfirmacao">
+  <div class="modal-content">
+    <h3>{{ tituloConfirmacao }}</h3>
+    <p>{{ mensagemConfirmacao }}</p>
+    <div class="modal-buttons">
+      <button class="btn-cancelar" (click)="cancelarConfirmacao()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarAcao()">Sim, confirmar</button>
+    </div>
+  </div>
 </div>

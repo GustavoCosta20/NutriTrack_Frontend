@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { RegisterUser } from '../models/register-user.model';
 import { Observable } from 'rxjs/internal/Observable';
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { LoginUser } from '../models/login-user.model'; 
 import { tap } from 'rxjs';
 import { UserProfileDto } from '../models/user.model';
+import { CriarRefeicaoRequest, CriarRefeicaoResponse, RefeicaoDto, RefeicoesDoHojeResponse } from '../models/snack.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,113 @@ export class AuthService {
   }
 
   getUserProfile(): Observable<UserProfileDto> {
-    return this.http.get<UserProfileDto>(`${this.apiUrl}/user/me`);
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<UserProfileDto>(`${this.apiUrl}/user/me`, { headers });
   }
 
+  updateUserProfile(userData: any): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.put(`${this.apiUrl}/user/me`, userData, { headers });
+  }
+
+  questionForIA(question: string): Observable<string> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    // Encode da pergunta para URL
+    const params = { pergunta: question };
+
+    return this.http.get<string>(`${this.apiUrl}/ai/connection`, { 
+      headers, 
+      params,
+      responseType: 'text' as 'json'
+    });
+  }
+
+  criarRefeicao(descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
+    const request: CriarRefeicaoRequest = {
+      descricaoRefeicao,
+      nomeRefeicao
+    };
+
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.post<CriarRefeicaoResponse>(
+      `${this.apiUrl}/refeicao`, 
+      request, 
+      { headers }
+    );
+  }
+
+  obterRefeicoesDeHoje(): Observable<RefeicoesDoHojeResponse> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<RefeicoesDoHojeResponse>(
+      `${this.apiUrl}/refeicao/hoje`, 
+      { headers }
+    );
+  }
+
+  obterRefeicoes(data?: string): Observable<RefeicaoDto[]> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    let url = `${this.apiUrl}/refeicao`;
+    if (data) {
+      url += `?data=${data}`;
+    }
+
+    return this.http.get<RefeicaoDto[]>(url, { headers });
+  }
+
+  atualizarRefeicao(refeicaoId: string, descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
+    const request: CriarRefeicaoRequest = {
+      descricaoRefeicao,
+      nomeRefeicao
+    };
+
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.put<CriarRefeicaoResponse>(
+      `${this.apiUrl}/refeicao/${refeicaoId}`, 
+      request, 
+      { headers }
+    );
+  }
+
+  excluirRefeicao(refeicaoId: string): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete(
+      `${this.apiUrl}/refeicao/${refeicaoId}`, 
+      { headers }
+    );
+  }
 }

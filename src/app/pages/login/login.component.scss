@@ -1,118 +1,169 @@
+/* ---------- Layout Geral ---------- */
 .page-wrapper {
-  display: flex;             // Ativa o modo flexbox
-  align-items: center;       // Centraliza na vertical
-  justify-content: center;   // Centraliza na horizontal
-  min-height: 100vh;         // Garante que a altura seja no mínimo 100% da tela
-  padding: 2rem;             // Adiciona um respiro nas laterais em telas menores
-  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #ead626; /* Amarelo principal */
+  font-family: "Poppins", sans-serif;
+  padding: 1rem;
 }
 
+/* ---------- Container ---------- */
 .auth-container {
-  max-width: 550px;
-  width: 500px;
-  padding: 7rem;   // Espaçamento interno generoso
-  background-color: #fdf3ca; // Fundo branco para contraste
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Sombra mais suave
-}
-
-.logo-container {
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 420px;
   text-align: center;
-  margin: 0.1rem;
+  transition: all 0.3s ease;
 }
 
+.auth-container:hover {
+  transform: translateY(-3px);
+}
+
+/* ---------- Logo ---------- */
 .logo-container img {
-  max-width: 450px;
-  height: auto;
+  width: 200px; /* Aumentada */
+  margin-bottom: 1.8rem;
 }
 
-// Títulos e textos com melhor hierarquia
+/* ---------- Título ---------- */
 h2 {
-  text-align: center;
-  margin: 0.1rem;
-  font-size: 2.5rem;
-  color: var(--cor-secundaria);
+  margin-bottom: 0.4rem;
+  color: #2c3e50;
+  font-size: 1.9rem;
+  font-weight: 700;
 }
 
-p {
-  text-align: center;
+.subtitle {
+  color: #555;
+  font-size: 0.95rem;
   margin-bottom: 2rem;
-  color: #666;
-  font-size: 1.5rem;
 }
 
-// Estilos para o grupo de formulário e labels
+/* ---------- Formulário ---------- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
 .form-group {
-  margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 800; // Semi-bold
-  color: #555;
-  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+  color: #2c3e50;
+  font-weight: 500;
 }
 
-// Estilos para os campos de input
-input[type="email"],
-input[type="password"] {
+input {
   width: 100%;
-  padding: 1rem; 
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  background-color: #f9f9f9; // Fundo do input cinza claro
-  transition: border-color 0.2s, box-shadow 0.2s;
+  padding: 0.9rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #fafafa;
+  transition: all 0.25s ease;
 }
 
-// Efeito de foco para os inputs
 input:focus {
+  border-color: #ead626;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(234, 214, 38, 0.25);
   outline: none;
-  border-color: var(--cor-primaria); // Borda fica amarela ao focar
-  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.25);
 }
 
-// Botão com a cor primária de destaque
-button {
-  width: 100%;
-  padding: 0.8rem;
-  background-color: var(--cor-primaria); // Amarelo forte
-  color: var(--cor-secundaria); // Texto escuro para contraste
+/* ---------- Botão Moderno ---------- */
+.btn-primary {
+  background: linear-gradient(135deg, #f4e04d, #e5c500);
+  color: #222;
+  font-size: 1.05rem;
+  font-weight: 600;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
+  border-radius: 50px;
+  padding: 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover {
-  background-color: var(--cor-primaria-escura);
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: skewX(-20deg);
+  transition: left 0.4s ease;
 }
 
-button:disabled {
-  background-color: #ccc;
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:disabled {
+  background: #e0e0e0;
+  color: #888;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-// Link para a página de registro
-.switch-link {
-  text-align: center;
-  margin-top: 1.5rem;
-
-  a {
-    color: var(--cor-primaria-escura);
-    text-decoration: none;
-    font-weight: 600;
-    &:hover { text-decoration: underline; }
-  }
-}
-
-// Mensagens de erro
+/* ---------- Erros ---------- */
 .error-message {
-  color: var(--cor-erro);
-  font-size: 0.875em;
-  margin-top: 0.25rem;
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+.global-error {
+  background: rgba(231, 76, 60, 0.1);
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+/* ---------- Link de Registro ---------- */
+.switch-link {
+  margin-top: 1.8rem;
+}
+
+.switch-link a {
+  color: #d4b100;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.switch-link a:hover {
+  color: #bda100;
+}
+
+/* ---------- Responsividade ---------- */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .logo-container img {
+    width: 150px;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
 }

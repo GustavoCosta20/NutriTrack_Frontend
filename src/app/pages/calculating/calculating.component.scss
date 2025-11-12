@@ -1,49 +1,92 @@
+/* ---------- Layout Geral ---------- */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100vh;
+  background: #ead626; /* Amarelo principal */
+  font-family: "Poppins", sans-serif;
   text-align: center;
+  animation: fadeIn 1s ease-in;
 }
 
+/* ---------- Logo ---------- */
 .logo-container img {
-  max-width: 220px;
+  width: 200px; /* mesmo tamanho da tela de login */
   margin-bottom: 2rem;
+  animation: float 2.5s ease-in-out infinite;
 }
 
+/* ---------- Texto ---------- */
 .loading-text {
-  font-size: 1.2rem;
-  color: var(--cor-secundaria);
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
 }
 
+/* ---------- Barra de Progresso ---------- */
 .progress-bar-container {
   width: 80%;
   max-width: 400px;
-  height: 20px;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden; // Garante que a barra interna não saia das bordas
+  height: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
 }
 
 .progress-bar {
   height: 100%;
-  width: 100%; // Começa com largura total
-  background-color: var(--cor-primaria); // Usa nosso amarelo
-  border-radius: 10px;
-
-  // Animação da barra de progresso
-  transform-origin: left; // Animação começa da esquerda
-  animation: progress-animation 10s linear forwards;
+  width: 0%;
+  background: linear-gradient(135deg, #f4e04d, #e5c500);
+  border-radius: 50px;
+  animation: progressAnimation 4s ease-in-out infinite;
 }
 
-// Define a animação
-@keyframes progress-animation {
+/* ---------- Animações ---------- */
+@keyframes fadeIn {
   from {
-    transform: scaleX(0); // Começa com 0% de largura
+    opacity: 0;
+    transform: translateY(15px);
   }
   to {
-    transform: scaleX(1); // Termina com 100% de largura
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes progressAnimation {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 90%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+/* ---------- Responsividade ---------- */
+@media (max-width: 480px) {
+  .logo-container img {
+    width: 150px;
+  } 
+
+  .loading-text {
+    font-size: 1rem;
+    padding: 0 1rem;
   }
 }

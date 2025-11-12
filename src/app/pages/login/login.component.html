@@ -1,40 +1,41 @@
 <div class="page-wrapper">
-
   <div class="auth-container">
     <div class="logo-container">
       <img src="assets/images/logo.png" alt="Logo do NutriTrack">
     </div>
-  
+
     <h2>Bem-vindo de Volta!</h2>
-    <p>Faça login para acessar sua conta NutriTrack.</p>
-  
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    
+    <p class="subtitle">Acesse sua conta NutriTrack e continue sua jornada saudável.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
       <div class="form-group">
-        <label for="email">E-mail:</label>
+        <label for="email">E-mail</label>
         <input type="email" id="email" formControlName="email" placeholder="seuemail@exemplo.com">
         <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
           Por favor, insira um e-mail válido.
         </div>
       </div>
-    
+
       <div class="form-group">
-        <label for="senha">Senha:</label>
+        <label for="senha">Senha</label>
         <input type="password" id="senha" formControlName="senha" placeholder="Sua senha">
         <div *ngIf="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" class="error-message">
           A senha é obrigatória.
         </div>
       </div>
-      
-      <div *ngIf="errorMessage" class="error-message">
+
+      <div *ngIf="errorMessage" class="error-message global-error">
         {{ errorMessage }}
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid">Entrar</button>
+      <button type="submit" [disabled]="loginForm.invalid" class="btn-primary">
+        Entrar
+      </button>
     </form>
-  
+
     <div class="switch-link">
-      <p>Não tem uma conta? <a routerLink="/register">Crie uma agora!</a></p>
+      <p>Não tem uma conta? <a routerLink="/register">Crie uma agora</a> ✨</p>
     </div>
   </div>
 </div>
