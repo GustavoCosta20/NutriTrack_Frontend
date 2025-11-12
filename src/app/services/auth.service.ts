@@ -131,4 +131,16 @@ export class AuthService {
       { headers }
     );
   }
+
+  excluirRefeicao(refeicaoId: string): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete(
+      `${this.apiUrl}/refeicao/${refeicaoId}`, 
+      { headers }
+    );
+  }
 }

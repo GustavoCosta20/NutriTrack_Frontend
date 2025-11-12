@@ -726,7 +726,19 @@
   margin-top: 0.25rem;
 }
 
-.btn-editar {
+.message-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gemini-message:hover .message-actions {
+  opacity: 1;
+}
+
+.btn-editar,
+.btn-excluir {
   background: rgba(234, 214, 38, 0.1);
   border: 1px solid rgba(234, 214, 38, 0.3);
   border-radius: 6px;
@@ -734,58 +746,23 @@
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  opacity: 0;
   
   &:hover {
-    background: rgba(234, 214, 38, 0.2);
     transform: translateY(-1px);
   }
 }
 
-.gemini-message:hover .btn-editar {
-  opacity: 1;
+.btn-editar:hover {
+  background: rgba(234, 214, 38, 0.2);
+  border-color: rgba(234, 214, 38, 0.5);
 }
 
-.editing-banner {
-  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-  border: 2px solid #ffc107;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  animation: slideDown 0.3s ease;
+.btn-excluir {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.3);
 }
 
-.editing-text {
-  font-weight: 600;
-  color: #856404;
-}
-
-.btn-cancelar-edicao {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid #ffc107;
-  border-radius: 6px;
-  padding: 0.25rem 0.75rem;
-  cursor: pointer;
-  font-weight: 600;
-  color: #856404;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.8);
-    transform: translateX(2px);
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.btn-excluir:hover {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.5);
 }

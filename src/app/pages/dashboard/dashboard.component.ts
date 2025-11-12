@@ -567,4 +567,72 @@ export class DashboardComponent implements OnInit {
       return 'linear-gradient(90deg, #28a745, #20c997)';
     }
   }
+
+  excluirRefeicao(mensagem: MensagemChat): void {
+    if (!mensagem.refeicaoId) return;
+
+    this.abrirConfirmacao(
+      'Excluir refeição',
+      'Deseja realmente excluir esta refeição? Esta ação não pode ser desfeita.',
+      () => {
+        this.aguardandoResposta = true;
+
+        this.authService.excluirRefeicao(mensagem.refeicaoId!).subscribe({
+          next: (resposta) => {
+            this.mensagensChat = this.mensagensChat.filter(m => {
+              if (m.tipo === 'ia' && m.refeicaoId === mensagem.refeicaoId) {
+                console.log('Removendo mensagem da IA com refeicaoId:', m.refeicaoId);
+                return false;
+              }
+              return true;
+            });
+
+            this.mensagensChat.push({
+              texto: '🗑️ Refeição excluída com sucesso!',
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+
+            const hoje = this.obterDataAtual();
+            const chaveStorage = this.gerarChaveStorage(hoje);
+            
+            const dadosParaSalvar: HistoricoChat = {
+              data: hoje,
+              mensagens: this.mensagensChat
+            };
+            
+            try {
+              localStorage.setItem(chaveStorage, JSON.stringify(dadosParaSalvar));
+            } catch (error) {
+              console.error('❌ Erro ao salvar no localStorage:', error);
+            }
+
+            this.carregarRefeicoesDeHoje();
+            
+            this.aguardandoResposta = false;
+            setTimeout(() => this.scrollToBottom(), 100);
+          },
+          error: (erro) => {
+            console.error('Erro ao excluir refeição:', erro);
+            
+            let mensagemErro = 'Desculpe, ocorreu um erro ao excluir sua refeição. Por favor, tente novamente.';
+            
+            if (erro.status === 400 && erro.error?.mensagem) {
+              mensagemErro = erro.error.mensagem;
+            }
+            
+            this.mensagensChat.push({
+              texto: mensagemErro,
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+            
+            this.salvarHistoricoChat();
+            this.aguardandoResposta = false;
+            setTimeout(() => this.scrollToBottom(), 100);
+          }
+        });
+      }
+    );
+  }
 }
