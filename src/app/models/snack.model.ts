@@ -53,3 +53,16 @@ export interface RefeicoesDoHojeResponse {
     gorduras: number;
   };
 }
+
+export interface EditarRefeicaoRequest {
+  descricaoRefeicao: string;
+  nomeRefeicao?: string;
+}
+
+export interface MensagemChat {
+  texto: string;
+  tipo: 'usuario' | 'ia';
+  timestamp: Date;
+  refeicaoId?: string;
+  podEditar?: boolean;
+}

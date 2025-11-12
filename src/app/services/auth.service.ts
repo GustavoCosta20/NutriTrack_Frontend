@@ -112,4 +112,23 @@ export class AuthService {
 
     return this.http.get<RefeicaoDto[]>(url, { headers });
   }
+
+  atualizarRefeicao(refeicaoId: string, descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
+    const request: CriarRefeicaoRequest = {
+      descricaoRefeicao,
+      nomeRefeicao
+    };
+
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    return this.http.put<CriarRefeicaoResponse>(
+      `${this.apiUrl}/refeicao/${refeicaoId}`, 
+      request, 
+      { headers }
+    );
+  }
 }

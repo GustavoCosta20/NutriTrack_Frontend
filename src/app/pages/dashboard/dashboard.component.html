@@ -125,8 +125,7 @@
       </div>
       
       <p class="chat-description">Descreva o que você comeu. Ex: "almoço, 200g de arroz, 150g de frango e salada".</p>
-      
-      <!-- Modal de Histórico -->
+    
       <div class="historico-modal" *ngIf="mostrarHistorico">
         <div class="historico-overlay" (click)="toggleHistoricoChat()"></div>
         <div class="historico-content">
@@ -173,7 +172,16 @@
         <div *ngFor="let mensagem of mensagensChat" 
             [ngClass]="mensagem.tipo === 'usuario' ? 'user-message' : 'gemini-message'">
           <div class="message-content">{{ mensagem.texto }}</div>
-          <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+          <div class="message-footer">
+            <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+            <button 
+              *ngIf="mensagem.podEditar && mensagem.tipo === 'ia'" 
+              class="btn-editar"
+              (click)="iniciarEdicaoRefeicao(mensagem)"
+              title="Editar refeição">
+              ✏️
+            </button>
+          </div>
         </div>
         
         <div *ngIf="aguardandoResposta" class="gemini-message typing-indicator">
@@ -184,7 +192,12 @@
           </div>
         </div>
       </div>
-      
+
+      <div class="editing-banner" *ngIf="mensagemEditando">
+        <span class="editing-text">✏️ Editando refeição</span>
+        <button class="btn-cancelar-edicao" (click)="cancelarEdicao()">✕ Cancelar</button>
+      </div>
+
       <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
         <input 
           type="text" 
@@ -193,7 +206,7 @@
           autocomplete="off"
           [disabled]="aguardandoResposta">
         <button type="submit" [disabled]="aguardandoResposta">
-          {{ aguardandoResposta ? 'Enviando...' : 'Enviar' }}
+          {{ aguardandoResposta ? 'Enviando...' : (mensagemEditando ? 'Atualizar' : 'Enviar') }}
         </button>
       </form>
     </div>

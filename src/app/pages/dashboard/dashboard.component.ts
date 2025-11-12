@@ -2,9 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { RefeicaoDto } from 'src/app/models/snack.model';
 
+interface MensagemChat {
+  texto: string;
+  tipo: 'usuario' | 'ia';
+  timestamp: Date;
+  refeicaoId?: string;
+  podEditar?: boolean;
+}
+
 interface HistoricoChat {
   data: string;
-  mensagens: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }>;
+  mensagens: MensagemChat[];
 }
 
 @Component({
@@ -14,7 +22,6 @@ interface HistoricoChat {
 })
 export class DashboardComponent implements OnInit {
 
-  // --- DADOS DE METAS 
   nomeUsuario: string = "Carregando...";
   objetivo: string = "-";
   caloriasMeta: number = 0;
@@ -22,13 +29,11 @@ export class DashboardComponent implements OnInit {
   carboidratosMeta: number = 0;
   gordurasMeta: number = 0;
 
-  // --- DADOS PROGRESSO DIÁRIO ---
   caloriasConsumidas: number = 0;
   proteinasConsumidas: number = 0;
   carboidratosConsumidos: number = 0;
   gordurasConsumidas: number = 0;
 
-  // --- REFEIÇÕES DO DIA ---
   refeicoesDeHoje: RefeicaoDto[] = [];
 
   dadosDoGrafico: { name: string, value: number }[] = [];
@@ -36,17 +41,18 @@ export class DashboardComponent implements OnInit {
     domain: ['#e63e28ff', '#92918dff', '#C7B42C'] 
   };
 
-  // Propriedades do Chat
-  mensagensChat: Array<{ texto: string, tipo: 'usuario' | 'ia', timestamp: Date }> = [];
+  mensagensChat: MensagemChat[] = [];
   aguardandoResposta = false;
   
-  // NOVO: Propriedades do histórico
   mostrarHistorico = false;
   historicoConversas: HistoricoChat[] = [];
   mostrarConfirmacao = false;
   tituloConfirmacao = '';
   mensagemConfirmacao = '';
   acaoConfirmacao: (() => void) | null = null;
+
+  mensagemEditando: MensagemChat | null = null;
+  refeicaoEditando: string = '';
 
   constructor(private authService: AuthService) { }
 
@@ -57,28 +63,23 @@ export class DashboardComponent implements OnInit {
     this.carregarListaHistoricos();
   }
 
-  // ==================== MÉTODOS DE HISTÓRICO ====================
-
-  /**
-   * Carrega o histórico do dia atual
-   */
   private carregarHistoricoChat(): void {
     const hoje = this.obterDataAtual();
     const historicoHoje = this.obterHistoricoPorData(hoje);
     
     if (historicoHoje && historicoHoje.mensagens.length > 0) {
       this.mensagensChat = historicoHoje.mensagens.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp)
+        texto: msg.texto,
+        tipo: msg.tipo,
+        timestamp: new Date(msg.timestamp),
+        refeicaoId: msg.refeicaoId,
+        podEditar: msg.podEditar
       }));
     } else {
       this.iniciarNovaConversa();
     }
   }
 
-  /**
-   * Inicia uma nova conversa
-   */
   private iniciarNovaConversa(): void {
     this.mensagensChat = [
       { 
@@ -90,9 +91,6 @@ export class DashboardComponent implements OnInit {
     this.salvarHistoricoChat();
   }
 
-  /**
-   * Salva o histórico do chat atual
-   */
   private salvarHistoricoChat(): void {
     const hoje = this.obterDataAtual();
     const chaveStorage = this.gerarChaveStorage(hoje);
@@ -110,9 +108,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Carrega a lista de todos os históricos salvos
-   */
   private carregarListaHistoricos(): void {
     try {
       const listaHistoricos = localStorage.getItem('chatHistoricoLista');
@@ -123,7 +118,6 @@ export class DashboardComponent implements OnInit {
           .map(data => this.obterHistoricoPorData(data))
           .filter(hist => hist !== null) as HistoricoChat[];
         
-        // Ordena do mais recente para o mais antigo
         this.historicoConversas.sort((a, b) => 
           new Date(b.data).getTime() - new Date(a.data).getTime()
         );
@@ -133,9 +127,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Atualiza a lista de históricos com uma nova data
-   */
   private atualizarListaHistoricos(novaData: string): void {
     try {
       const listaHistoricos = localStorage.getItem('chatHistoricoLista');
@@ -152,9 +143,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Obtém histórico de uma data específica
-   */
   private obterHistoricoPorData(data: string): HistoricoChat | null {
     try {
       const chave = this.gerarChaveStorage(data);
@@ -166,24 +154,15 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Gera a chave de storage para uma data
-   */
   private gerarChaveStorage(data: string): string {
     return `chatHistorico_${data}`;
   }
 
-  /**
-   * Obtém a data atual no formato YYYY-MM-DD
-   */
   private obterDataAtual(): string {
     const hoje = new Date();
     return hoje.toISOString().split('T')[0];
   }
 
-  /**
-   * Formata a data para exibição no histórico
-   */
   formatarDataHistorico(data: string): string {
     const hoje = this.obterDataAtual();
     const ontem = new Date();
@@ -200,9 +179,6 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Toggle do modal de histórico
-   */
   toggleHistoricoChat(): void {
     this.mostrarHistorico = !this.mostrarHistorico;
     if (this.mostrarHistorico) {
@@ -210,16 +186,16 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  /**
-   * Carrega o histórico de um dia específico
-   */
   carregarHistoricoDia(data: string): void {
     const historico = this.obterHistoricoPorData(data);
     
     if (historico) {
       this.mensagensChat = historico.mensagens.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp)
+        texto: msg.texto,
+        tipo: msg.tipo,
+        timestamp: new Date(msg.timestamp),
+        refeicaoId: msg.refeicaoId,
+        podEditar: msg.podEditar
       }));
       
       this.mostrarHistorico = false;
@@ -239,7 +215,6 @@ export class DashboardComponent implements OnInit {
           const chave = this.gerarChaveStorage(data);
           localStorage.removeItem(chave);
 
-          // Remove da lista de históricos
           const listaHistoricos = localStorage.getItem('chatHistoricoLista');
           if (listaHistoricos) {
             let datas: string[] = JSON.parse(listaHistoricos);
@@ -247,7 +222,6 @@ export class DashboardComponent implements OnInit {
             localStorage.setItem('chatHistoricoLista', JSON.stringify(datas));
           }
 
-          // Se deletou o histórico de hoje, inicia nova conversa
           if (data === this.obterDataAtual()) {
             this.iniciarNovaConversa();
           }
@@ -300,7 +274,99 @@ export class DashboardComponent implements OnInit {
     this.cancelarConfirmacao();
   }
 
-  // ==================== MÉTODOS EXISTENTES ====================
+  iniciarEdicaoRefeicao(mensagem: MensagemChat): void {
+    if (!mensagem.refeicaoId) return;
+    
+    this.mensagemEditando = mensagem;
+    this.refeicaoEditando = mensagem.refeicaoId;
+    
+    setTimeout(() => {
+      const inputElement = document.querySelector('input[name="chatInput"]') as HTMLInputElement;
+      if (inputElement) {
+        inputElement.placeholder = '✏️ Editando refeição... Digite a nova descrição';
+        inputElement.focus();
+      }
+    }, 100);
+  }
+
+  cancelarEdicao(): void {
+    this.mensagemEditando = null;
+    this.refeicaoEditando = '';
+    
+    const inputElement = document.querySelector('input[name="chatInput"]') as HTMLInputElement;
+    if (inputElement) {
+      inputElement.placeholder = 'Digite sua refeição aqui...';
+      inputElement.value = '';
+    }
+  }
+
+  private editarRefeicao(novaDescricao: string): void {
+    if (!this.mensagemEditando || !this.refeicaoEditando) return;
+    
+    this.aguardandoResposta = true;
+
+    this.mensagensChat.push({
+      texto: `✏️ Editando: ${novaDescricao}`,
+      tipo: 'usuario',
+      timestamp: new Date()
+    });
+    
+    this.authService.atualizarRefeicao(this.refeicaoEditando, novaDescricao, '').subscribe({
+      next: (resposta) => {
+        if (resposta.sucesso && resposta.refeicao) {
+          const mensagemIA = `✅ Refeição atualizada com sucesso!\n\n${this.formatarRespostaRefeicao(resposta.refeicao)}`;
+          
+          this.mensagensChat.push({
+            texto: mensagemIA,
+            tipo: 'ia',
+            timestamp: new Date(),
+            refeicaoId: resposta.refeicao.id,
+            podEditar: true
+          });
+
+          this.carregarRefeicoesDeHoje();
+        } else {
+          this.mensagensChat.push({
+            texto: resposta.mensagem || 'Ocorreu um erro ao atualizar a refeição.',
+            tipo: 'ia',
+            timestamp: new Date()
+          });
+        }
+
+        this.cancelarEdicao();
+        this.salvarHistoricoChat();
+        this.aguardandoResposta = false;
+        setTimeout(() => this.scrollToBottom(), 100);
+      },
+      error: (erro) => {
+        console.error('Erro ao editar refeição:', erro);
+        
+        let mensagemErro = 'Desculpe, ocorreu um erro ao atualizar sua refeição. Por favor, tente novamente.';
+        
+        if (erro.status === 400 && erro.error?.mensagem) {
+          mensagemErro = erro.error.mensagem;
+        }
+        
+        this.mensagensChat.push({
+          texto: mensagemErro,
+          tipo: 'ia',
+          timestamp: new Date()
+        });
+        
+        this.cancelarEdicao();
+        this.salvarHistoricoChat();
+        this.aguardandoResposta = false;
+        setTimeout(() => this.scrollToBottom(), 100);
+      }
+    });
+    
+    const inputElement = document.querySelector('input[name="chatInput"]') as HTMLInputElement;
+    if (inputElement) {
+      inputElement.value = '';
+    }
+    
+    setTimeout(() => this.scrollToBottom(), 100);
+  }
 
   carregarDadosUsuario(): void {
     this.authService.getUserProfile().subscribe({
@@ -379,6 +445,11 @@ export class DashboardComponent implements OnInit {
     const mensagem = inputElement.value;
     
     if (mensagem.trim() && !this.aguardandoResposta) {
+      if (this.mensagemEditando && this.mensagemEditando.refeicaoId) {
+        this.editarRefeicao(mensagem);
+        return;
+      }
+
       this.mensagensChat.push({
         texto: mensagem,
         tipo: 'usuario',
@@ -397,7 +468,9 @@ export class DashboardComponent implements OnInit {
             this.mensagensChat.push({
               texto: mensagemIA,
               tipo: 'ia',
-              timestamp: new Date()
+              timestamp: new Date(),
+              refeicaoId: resposta.refeicao.id,
+              podEditar: true
             });
 
             this.carregarRefeicoesDeHoje();

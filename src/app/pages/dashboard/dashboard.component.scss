@@ -39,7 +39,6 @@
   }
 }
 
-// Cards específicos
 .calorias-card, .macros-card, .progresso-card {
   min-height: 300px;
 }
@@ -88,7 +87,6 @@
       color: #2c3e50;
     }
 
-    // Wrapper da barra de progresso
     .macro-progress-wrapper {
       .macro-progress-bar-container {
         width: 100%;
@@ -107,7 +105,6 @@
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
       }
 
-      // Cores específicas para cada macro
       .macro-progress-proteinas {
         background: linear-gradient(90deg, #a8385d, #a73259);
       }
@@ -129,7 +126,6 @@
   }
 }
 
-// Estilos da Barra de Progresso (dentro do card de calorias)
 .progresso-wrapper {
   margin-top: auto;
   padding-top: 1.5rem;
@@ -154,7 +150,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
   
-  // Efeito de brilho na barra
   &::after {
     content: '';
     position: absolute;
@@ -175,7 +170,6 @@
   font-weight: 500;
 }
 
-// Estilos do Gráfico de Progresso
 .progresso-card {
   .chart-wrapper {
     height: 280px;
@@ -192,7 +186,6 @@
     }
   }
   
-  // LEGENDA CUSTOMIZADA
   .custom-legend {
     display: flex;
     justify-content: center;
@@ -243,10 +236,6 @@
   }
 }
 
-// ==========================================
-// ESTILOS DO CHAT
-// ==========================================
-
 .chat-card {
   grid-column: 1 / -1;
   min-height: 500px;
@@ -272,7 +261,6 @@
     min-height: 300px;
     border: 1px solid #e0e0e0;
 
-    // Scrollbar personalizada
     &::-webkit-scrollbar {
       width: 6px;
     }
@@ -292,7 +280,6 @@
     }
   }
 
-  // Mensagens
   .gemini-message,
   .user-message {
     max-width: 80%;
@@ -338,7 +325,6 @@
     color: #666;
   }
 
-  // Indicador de digitação
   .typing-indicator {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -366,7 +352,6 @@
     }
   }
 
-  // Formulário de Input
   .chat-input-form {
     display: flex;
     gap: 8px;
@@ -417,7 +402,6 @@
   }
 }
 
-// Animações
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -440,7 +424,6 @@
   }
 }
 
-// Responsividade
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
@@ -469,7 +452,6 @@
   }
 }
 
-// Cabeçalho do chat com botões
 .chat-header {
   display: flex;
   justify-content: space-between;
@@ -503,7 +485,6 @@
   margin-bottom: 1rem;
 }
 
-// Modal de Histórico
 .historico-modal {
   position: fixed;
   top: 0;
@@ -735,4 +716,76 @@
 @keyframes scaleIn {
   from { transform: scale(0.9); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.btn-editar {
+  background: rgba(234, 214, 38, 0.1);
+  border: 1px solid rgba(234, 214, 38, 0.3);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  
+  &:hover {
+    background: rgba(234, 214, 38, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
+.gemini-message:hover .btn-editar {
+  opacity: 1;
+}
+
+.editing-banner {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideDown 0.3s ease;
+}
+
+.editing-text {
+  font-weight: 600;
+  color: #856404;
+}
+
+.btn-cancelar-edicao {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: #856404;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateX(2px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
