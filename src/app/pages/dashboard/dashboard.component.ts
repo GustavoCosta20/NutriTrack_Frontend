@@ -15,6 +15,12 @@ interface HistoricoChat {
   mensagens: MensagemChat[];
 }
 
+interface MensagemChatIA {
+  texto: string;
+  tipo: 'usuario' | 'ia';
+  timestamp: Date;
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -54,6 +60,10 @@ export class DashboardComponent implements OnInit {
   mensagemEditando: MensagemChat | null = null;
   refeicaoEditando: string = '';
 
+  mostrarChatIA = false;
+  mensagensChatIA: MensagemChatIA[] = [];
+  aguardandoRespostaIA = false;
+
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
@@ -61,6 +71,7 @@ export class DashboardComponent implements OnInit {
     this.carregarRefeicoesDeHoje();
     this.carregarHistoricoChat();
     this.carregarListaHistoricos();
+    this.carregarHistoricoChatIA();
   }
 
   private carregarHistoricoChat(): void {
@@ -634,5 +645,129 @@ export class DashboardComponent implements OnInit {
         });
       }
     );
+  }
+
+  toggleChatIA(): void {
+    this.mostrarChatIA = !this.mostrarChatIA;
+    
+    if (this.mostrarChatIA && this.mensagensChatIA.length === 0) {
+      this.iniciarChatIA();
+    }
+    
+    if (this.mostrarChatIA) {
+      setTimeout(() => this.scrollToBottomIA(), 100);
+    }
+  }
+
+  private iniciarChatIA(): void {
+    this.mensagensChatIA = [
+      {
+        texto: '👋 Olá! Sou sua assistente nutricional. Posso ajudá-lo com:\n\n' +
+              '• Sugestões de dietas e cardápios\n' +
+              '• Melhores horários para refeições\n' +
+              '• Dúvidas sobre alimentos e nutrientes\n' +
+              '• Dicas de alimentação saudável\n\n' +
+              'Como posso ajudá-lo hoje?',
+        tipo: 'ia',
+        timestamp: new Date()
+      }
+    ];
+    this.salvarHistoricoChatIA();
+  }
+
+  enviarMensagemIA(event: Event): void {
+    event.preventDefault();
+    const inputElement = (event.target as HTMLFormElement).elements.namedItem('chatIAInput') as HTMLInputElement;
+    const mensagem = inputElement.value;
+
+    if (mensagem.trim() && !this.aguardandoRespostaIA) {
+      this.mensagensChatIA.push({
+        texto: mensagem,
+        tipo: 'usuario',
+        timestamp: new Date()
+      });
+
+      this.salvarHistoricoChatIA();
+      inputElement.value = '';
+      this.aguardandoRespostaIA = true;
+
+      this.authService.conversarComIA(mensagem).subscribe({
+        next: (resposta) => {
+          if (resposta.sucesso && resposta.resposta) {
+            this.mensagensChatIA.push({
+              texto: resposta.resposta,
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+          } else {
+            this.mensagensChatIA.push({
+              texto: 'Desculpe, ocorreu um erro ao processar sua mensagem.',
+              tipo: 'ia',
+              timestamp: new Date()
+            });
+          }
+
+          this.salvarHistoricoChatIA();
+          this.aguardandoRespostaIA = false;
+          setTimeout(() => this.scrollToBottomIA(), 100);
+        },
+        error: (erro) => {
+          console.error('Erro ao conversar com IA:', erro);
+
+          this.mensagensChatIA.push({
+            texto: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+            tipo: 'ia',
+            timestamp: new Date()
+          });
+
+          this.salvarHistoricoChatIA();
+          this.aguardandoRespostaIA = false;
+          setTimeout(() => this.scrollToBottomIA(), 100);
+        }
+      });
+
+      setTimeout(() => this.scrollToBottomIA(), 100);
+    }
+  }
+
+  limparChatIA(): void {
+    this.abrirConfirmacao(
+      'Limpar chat com IA',
+      'Deseja realmente limpar esta conversa?',
+      () => {
+        this.iniciarChatIA();
+        setTimeout(() => this.scrollToBottomIA(), 100);
+      }
+    );
+  }
+
+  private scrollToBottomIA(): void {
+    const chatWindow = document.querySelector('.chat-ia-window');
+    if (chatWindow) {
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  }
+
+  private salvarHistoricoChatIA(): void {
+    try {
+      localStorage.setItem('chatIAHistorico', JSON.stringify(this.mensagensChatIA));
+    } catch (error) {
+      console.error('Erro ao salvar histórico do chat IA:', error);
+    }
+  }
+
+  private carregarHistoricoChatIA(): void {
+    try {
+      const historico = localStorage.getItem('chatIAHistorico');
+      if (historico) {
+        this.mensagensChatIA = JSON.parse(historico).map((msg: any) => ({
+          texto: msg.texto,
+          tipo: msg.tipo,
+          timestamp: new Date(msg.timestamp)
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar histórico do chat IA:', error);
+    }
   }
 }

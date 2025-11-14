@@ -27,6 +27,7 @@ export class AuthService {
   }
 
   login(loginData: LoginUser): Observable<{ token: string }> {
+    console.log('API => ', this.apiUrl)
     return this.http.post<{ token: string }>(`${this.apiUrl}/user/login`, loginData).pipe(
       tap(response => {
         if (response?.token) {
@@ -96,5 +97,9 @@ export class AuthService {
       headers = headers.set('Content-Type', 'application/json');
     }
     return headers;
+  }
+
+  conversarComIA(mensagem: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ChatIa/conversar`, { mensagem });
   }
 }
