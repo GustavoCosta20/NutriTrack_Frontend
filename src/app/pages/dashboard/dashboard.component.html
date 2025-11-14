@@ -26,8 +26,8 @@
       <div class="macros-grid">
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Proteínas</span>
-            <span class="macro-valor">{{ proteinasMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">Proteínas</span>
+            <span class="macro-valor" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">{{ proteinasMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -36,14 +36,17 @@
                 [style.width.%]="calcularPercentual(proteinasConsumidas, proteinasMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">
+            ✅ Meta de proteínas atingida!
           </div>
         </div>
 
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Carboidratos</span>
-            <span class="macro-valor">{{ carboidratosMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">Carboidratos</span>
+            <span class="macro-valor" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">{{ carboidratosMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -52,14 +55,17 @@
                 [style.width.%]="calcularPercentual(carboidratosConsumidos, carboidratosMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">
+            ✅ Meta de carboidratos atingida!
           </div>
         </div>
 
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Gorduras</span>
-            <span class="macro-valor">{{ gordurasMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">Gorduras</span>
+            <span class="macro-valor" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">{{ gordurasMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -68,7 +74,10 @@
                 [style.width.%]="calcularPercentual(gordurasConsumidas, gordurasMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">
+            ✅ Meta de gorduras atingida!
           </div>
         </div>
       </div>
