@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router'; // 1. Importe o Router
-import { AuthService } from '../../services/auth.service'; // 2. Importe o AuthService
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -11,8 +11,8 @@ import { AuthService } from '../../services/auth.service'; // 2. Importe o AuthS
   
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
-
   errorMessage: string | null = null;
+  isLoading: boolean = false;
 
   generos = [
     { valor: 1, texto: 'Masculino' },
@@ -33,7 +33,6 @@ export class RegisterComponent implements OnInit {
     { valor: 3, texto: 'Ganhar Massa Muscular' }
   ];
 
-  // Injetamos o FormBuilder para nos ajudar a criar o formulário
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -42,7 +41,6 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
-      // Definimos cada campo do formulário e suas validações
       nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       senha: ['', [Validators.required, Validators.minLength(8)]],
@@ -55,33 +53,28 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Método chamado quando o formulário é enviado
   onSubmit(): void {
-    if (this.registerForm.invalid) {
+    if (this.registerForm.invalid || this.isLoading) {
       this.registerForm.markAllAsTouched();
-      console.log('Formulário inválido');
+      console.log('Formulário inválido ou aguardando resposta');
       return;
     }
 
-    this.errorMessage = null; // Limpa erros anteriores
+    this.errorMessage = null;
+    this.isLoading = true; 
 
-    // Chama o método de registro do serviço, passando os valores do formulário
     this.authService.register(this.registerForm.value).subscribe({
       next: (response) => {
-        // SUCESSO!
         console.log('Usuário registrado com sucesso!', response);
-        // Redireciona o usuário para a página de login após o registro
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        // ERRO!
         console.error('Erro ao registrar:', err);
-        // Tenta pegar uma mensagem de erro específica da API, senão, usa uma genérica
         this.errorMessage = err.error?.message || 'Ocorreu um erro ao tentar registrar. Por favor, tente novamente.';
+        this.isLoading = false;
       }
     });
 
-    // Se o formulário for válido, aqui você enviará os dados para o seu serviço
     console.log('Formulário válido!');
     console.log(this.registerForm.value);
   }

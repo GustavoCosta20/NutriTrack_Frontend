@@ -11,9 +11,9 @@ export class ProfileComponent implements OnInit {
   profileForm!: FormGroup;
   editMode = false;
   loading = true;
+  isSubmitting = false;
   error: string | null = null;
 
-  // Dados do usuário inicializados vazios
   currentUser = {
     nomeCompleto: '',
     email: '',
@@ -25,7 +25,6 @@ export class ProfileComponent implements OnInit {
     objetivo: 0,
   };
 
-  // Opções para os formulários
   generos = [
     { valor: 1, texto: 'Masculino' }, 
     { valor: 2, texto: 'Feminino' }, 
@@ -68,7 +67,7 @@ export class ProfileComponent implements OnInit {
   private initForm(): void {
     this.profileForm = this.fb.group({
       nomeCompleto: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]], // MUDANÇA: removido o disabled
+      email: ['', [Validators.required, Validators.email]],
       dataNascimento: [null, Validators.required],
       alturaEmCm: [null, Validators.required],
       pesoEmKg: [null, Validators.required],
@@ -86,7 +85,6 @@ export class ProfileComponent implements OnInit {
       next: (user) => {
         console.log('Dados recebidos da API:', user);
         
-        // Mapeia os dados recebidos do backend
         this.currentUser = {
           nomeCompleto: user.nomeCompleto || '',
           email: user.email || '',
@@ -117,7 +115,6 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  // Converte a string do objetivo (vinda do backend) em número
   private parseObjetivo(objetivoStr: string): number {
     const objetivoMap: { [key: string]: number } = {
       'PerderGordura': 1,
@@ -131,21 +128,22 @@ export class ProfileComponent implements OnInit {
   toggleEditMode(): void {
     this.editMode = !this.editMode;
     if (!this.editMode) {
-      // Se o usuário cancelar, restaura os valores originais
       this.profileForm.patchValue(this.currentUser);
+      this.error = null;
     }
   }
 
   onSubmit(): void {
-    if (this.profileForm.invalid) {
-      this.error = 'Por favor, preencha todos os campos obrigatórios.';
+    if (this.profileForm.invalid || this.isSubmitting) {
+      if (this.profileForm.invalid) {
+        this.error = 'Por favor, preencha todos os campos obrigatórios.';
+      }
       return;
     }
 
-    // Prepara os dados para enviar ao backend
     const updatedData = {
       nomeCompleto: this.profileForm.get('nomeCompleto')?.value,
-      email: this.profileForm.get('email')?.value, // MUDANÇA: agora envia o email
+      email: this.profileForm.get('email')?.value,
       dataNascimento: this.profileForm.get('dataNascimento')?.value,
       alturaEmCm: Number(this.profileForm.get('alturaEmCm')?.value),
       pesoEmKg: Number(this.profileForm.get('pesoEmKg')?.value),
@@ -154,13 +152,15 @@ export class ProfileComponent implements OnInit {
       objetivo: Number(this.profileForm.get('objetivo')?.value)
     };
 
+    this.isSubmitting = true;
+    this.error = null;
+
     this.authService.updateUserProfile(updatedData).subscribe({
       next: (response) => {       
-        // Atualiza os dados locais com os novos valores
         this.currentUser = {
           ...this.currentUser,
           nomeCompleto: updatedData.nomeCompleto,
-          email: updatedData.email, // MUDANÇA: atualiza o email local
+          email: updatedData.email,
           dataNascimento: updatedData.dataNascimento,
           alturaEmCm: updatedData.alturaEmCm,
           pesoEmKg: updatedData.pesoEmKg,
@@ -171,16 +171,18 @@ export class ProfileComponent implements OnInit {
 
         this.editMode = false;
         this.error = null;
+        this.isSubmitting = false;
       },
       error: (err) => {
         console.error('Erro ao atualizar perfil:', err);
         
-        // NOVO: Tratamento de erro específico para email duplicado
         if (err.status === 400 && err.error?.message?.includes('email')) {
           this.error = 'Este email já está em uso por outra conta.';
         } else {
           this.error = 'Erro ao atualizar perfil. Tente novamente.';
         }
+        
+        this.isSubmitting = false;
       }
     });
   }

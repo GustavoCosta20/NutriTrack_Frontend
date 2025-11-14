@@ -11,7 +11,6 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
       
-      <!-- Mensagem de erro geral -->
       <div class="form-error-message" *ngIf="errorMessage">
         {{ errorMessage }}
       </div>
@@ -113,8 +112,9 @@
         </select>
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="registerForm.invalid">
-        Criar Conta
+      <button type="submit" class="btn-submit" [disabled]="registerForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Criar Conta</span>
+        <span *ngIf="isLoading">Criando Conta...</span>
       </button>
 
       <p class="login-link">
