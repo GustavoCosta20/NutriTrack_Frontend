@@ -288,14 +288,28 @@ export class DashboardComponent implements OnInit {
   iniciarEdicaoRefeicao(mensagem: MensagemChat): void {
     if (!mensagem.refeicaoId) return;
     
+    // Encontrar a mensagem do usuário anterior à resposta da IA
+    const indiceIA = this.mensagensChat.findIndex(m => m === mensagem);
+    let mensagemUsuario = '';
+    
+    // Procurar a mensagem do usuário anterior
+    for (let i = indiceIA - 1; i >= 0; i--) {
+      if (this.mensagensChat[i].tipo === 'usuario') {
+        mensagemUsuario = this.mensagensChat[i].texto;
+        break;
+      }
+    }
+    
     this.mensagemEditando = mensagem;
     this.refeicaoEditando = mensagem.refeicaoId;
     
     setTimeout(() => {
       const inputElement = document.querySelector('input[name="chatInput"]') as HTMLInputElement;
       if (inputElement) {
+        inputElement.value = mensagemUsuario;
         inputElement.placeholder = '✏️ Editando refeição... Digite a nova descrição';
         inputElement.focus();
+        inputElement.select(); // Seleciona todo o texto para facilitar a edição
       }
     }, 100);
   }
@@ -317,15 +331,19 @@ export class DashboardComponent implements OnInit {
     this.aguardandoResposta = true;
 
     this.mensagensChat.push({
-      texto: `✏️ Editando: ${novaDescricao}`,
+      texto: novaDescricao,
       tipo: 'usuario',
       timestamp: new Date()
     });
     
+    this.salvarHistoricoChat();
+    
     this.authService.atualizarRefeicao(this.refeicaoEditando, novaDescricao, '').subscribe({
       next: (resposta) => {
+        console.log('Resposta completa da API:', resposta);
+        
         if (resposta.sucesso && resposta.refeicao) {
-          const mensagemIA = `✅ Refeição atualizada com sucesso!\n\n${this.formatarRespostaRefeicao(resposta.refeicao)}`;
+          const mensagemIA = this.formatarRespostaRefeicaoAtualizada(resposta.refeicao);
           
           this.mensagensChat.push({
             texto: mensagemIA,
@@ -350,12 +368,18 @@ export class DashboardComponent implements OnInit {
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (erro) => {
-        console.error('Erro ao editar refeição:', erro);
+        console.error('Erro completo ao editar refeição:', erro);
+        console.error('Status:', erro.status);
+        console.error('Mensagem:', erro.error);
         
         let mensagemErro = 'Desculpe, ocorreu um erro ao atualizar sua refeição. Por favor, tente novamente.';
         
         if (erro.status === 400 && erro.error?.mensagem) {
+          mensagemErro = `Erro: ${erro.error.mensagem}`;
+        } else if (erro.error?.mensagem) {
           mensagemErro = erro.error.mensagem;
+        } else if (typeof erro.error === 'string') {
+          mensagemErro = `Erro do servidor: ${erro.error}`;
         }
         
         this.mensagensChat.push({
@@ -524,6 +548,23 @@ export class DashboardComponent implements OnInit {
 
   private formatarRespostaRefeicao(refeicao: RefeicaoDto): string {
     let mensagem = `✅ Refeição "${refeicao.nomeRef}" registrada com sucesso!\n\n`;
+    
+    mensagem += `📋 Alimentos:\n`;
+    refeicao.alimentos.forEach(alimento => {
+      mensagem += `• ${alimento.descricao} - ${alimento.quantidade}${alimento.unidade}\n`;
+    });
+    
+    mensagem += `\n📊 Totais desta refeição:\n`;
+    mensagem += `• Calorias: ${refeicao.totalCalorias.toFixed(0)} kcal\n`;
+    mensagem += `• Proteínas: ${refeicao.totalProteinas.toFixed(1)}g\n`;
+    mensagem += `• Carboidratos: ${refeicao.totalCarboidratos.toFixed(1)}g\n`;
+    mensagem += `• Gorduras: ${refeicao.totalGorduras.toFixed(1)}g`;
+    
+    return mensagem;
+  }
+
+  private formatarRespostaRefeicaoAtualizada(refeicao: RefeicaoDto): string {
+    let mensagem = `✏️ Refeição "${refeicao.nomeRef}" atualizada com sucesso!\n\n`;
     
     mensagem += `📋 Alimentos:\n`;
     refeicao.alimentos.forEach(alimento => {
