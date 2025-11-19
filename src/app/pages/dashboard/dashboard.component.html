@@ -184,7 +184,7 @@
         </div>
       </div>
 
-      <div class="chat-ia-modal" *ngIf="mostrarChatIA">
+      <div class="chat-ia-modal" [class.visible]="mostrarChatIA">
         <div class="historico-overlay" (click)="toggleChatIA()"></div>
         <div class="chat-ia-content">
           <div class="chat-ia-header">
@@ -270,6 +270,7 @@
 
       <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
         <input 
+          #chatInput
           type="text" 
           name="chatInput" 
           placeholder="Digite sua refeição aqui..." 
@@ -283,7 +284,7 @@
   </main>
 </div>
 
-<div class="modal-overlay" *ngIf="mostrarConfirmacao">
+<div class="modal-overlay" [class.visible]="mostrarConfirmacao">
   <div class="modal-content">
     <h3>{{ tituloConfirmacao }}</h3>
     <p>{{ mensagemConfirmacao }}</p>

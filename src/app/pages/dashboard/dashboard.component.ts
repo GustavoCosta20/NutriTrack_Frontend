@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { RefeicaoDto } from 'src/app/models/snack.model';
 
@@ -27,7 +27,7 @@ interface MensagemChatIA {
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-
+  @ViewChild('chatInput') chatInput!: ElementRef<HTMLInputElement>;
   nomeUsuario: string = "Carregando...";
   objetivo: string = "-";
   caloriasMeta: number = 0;
