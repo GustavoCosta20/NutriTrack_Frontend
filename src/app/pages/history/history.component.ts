@@ -31,12 +31,10 @@ export class HistoryComponent implements OnInit {
   carregando: boolean = false;
   erro: string = '';
 
-  // Controles do modal de exclusão
   modalExcluirAberto: boolean = false;
   refeicaoParaExcluir: { id: string; nome: string } | null = null;
   excluindo: boolean = false;
 
-  // Controles do modal de edição
   modalEditarAberto: boolean = false;
   refeicaoParaEditar: { id: string; nome: string } | null = null;
   nomeEdicao: string = '';
@@ -52,8 +50,6 @@ export class HistoryComponent implements OnInit {
   toggleDia(index: number): void {
     this.diaExpandido = this.diaExpandido === index ? null : index;
   }
-
-  // ============ MÉTODOS DE EXCLUSÃO ============
 
   abrirModalExcluir(refeicaoId: string, nomeRefeicao: string): void {
     this.refeicaoParaExcluir = { id: refeicaoId, nome: nomeRefeicao };
@@ -77,7 +73,7 @@ export class HistoryComponent implements OnInit {
         console.log('✅ Refeição excluída com sucesso!');
         this.excluindo = false;
         this.fecharModalExcluir();
-        this.carregarHistorico(); // Recarrega o histórico
+        this.carregarHistorico();
       },
       error: (error) => {
         console.error('❌ Erro ao excluir refeição:', error);
@@ -86,8 +82,6 @@ export class HistoryComponent implements OnInit {
       }
     });
   }
-
-  // ============ MÉTODOS DE EDIÇÃO ============
 
   abrirModalEditar(refeicaoId: string, nomeRefeicao: string): void {
     this.refeicaoParaEditar = { id: refeicaoId, nome: nomeRefeicao };
@@ -116,15 +110,12 @@ export class HistoryComponent implements OnInit {
     this.editando = true;
     this.erroEdicao = '';
 
-    // Usa o novo método para atualizar apenas o nome
     this.authService.atualizarNomeRefeicao(
       this.refeicaoParaEditar.id,
       this.nomeEdicao
     ).subscribe({
       next: (response) => {
         console.log('✅ Nome da refeição atualizado com sucesso!', response);
-        
-        // Atualiza apenas o nome localmente, sem recarregar tudo
         this.atualizarRefeicaoLocal(this.refeicaoParaEditar!.id, this.nomeEdicao);
         
         this.editando = false;
@@ -143,7 +134,6 @@ export class HistoryComponent implements OnInit {
     });
   }
 
-  // Atualiza o nome da refeição localmente sem recarregar
   private atualizarRefeicaoLocal(refeicaoId: string, novoNome: string): void {
     for (const dia of this.historico) {
       const refeicao = dia.refeicoes.find(r => r.id === refeicaoId);
@@ -153,8 +143,6 @@ export class HistoryComponent implements OnInit {
       }
     }
   }
-
-  // ============ CARREGAMENTO DE DADOS ============
 
   private carregarHistorico(): void {
     this.carregando = true;
@@ -202,7 +190,7 @@ export class HistoryComponent implements OnInit {
         totalCaloriasDia += ref.totalCalorias;
 
         return {
-          id: ref.id, // ✅ Agora inclui o ID da refeição
+          id: ref.id,
           nome: ref.nomeRef,
           alimentos: ref.alimentos.map(alim => ({
             descricao: `${alim.descricao} (${alim.quantidade}${alim.unidade})`,

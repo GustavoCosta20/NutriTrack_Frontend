@@ -48,7 +48,6 @@
   font-weight: 600;
 }
 
-// Accordion
 .accordion {
   display: flex;
   flex-direction: column;
@@ -145,7 +144,6 @@
   }
 }
 
-// Cards das refeições
 .meal-card {
   background: linear-gradient(135deg, #fafafa 0%, #f8f8f8 100%);
   border-radius: 12px;
@@ -215,7 +213,6 @@
   }
 }
 
-// Botões de ação
 .btn-icon {
   background: transparent;
   border: none;
@@ -245,7 +242,6 @@
   }
 }
 
-// Modais
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -373,7 +369,6 @@
   box-sizing: border-box;
 }
 
-// Botões
 .btn {
   padding: 0.65rem 1.35rem;
   border: none;
@@ -419,7 +414,6 @@
   }
 }
 
-// Formulário no modal de edição
 .form-group {
   margin-bottom: 1rem;
 
@@ -480,7 +474,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 768px) {
   .history-container {
     padding: 1.5rem 1rem;
