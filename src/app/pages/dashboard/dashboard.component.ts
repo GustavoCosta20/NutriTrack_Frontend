@@ -309,7 +309,7 @@ export class DashboardComponent implements OnInit {
         inputElement.value = mensagemUsuario;
         inputElement.placeholder = '✏️ Editando refeição... Digite a nova descrição';
         inputElement.focus();
-        inputElement.select(); // Seleciona todo o texto para facilitar a edição
+        inputElement.setSelectionRange(mensagemUsuario.length, mensagemUsuario.length);
       }
     }, 100);
   }
