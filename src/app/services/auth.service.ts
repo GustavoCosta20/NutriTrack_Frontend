@@ -83,6 +83,16 @@ export class AuthService {
     return this.http.put<CriarRefeicaoResponse>(`${this.apiUrl}/refeicao/${refeicaoId}`, request, { headers });
   }
 
+  atualizarNomeRefeicao(refeicaoId: string, nomeRefeicao: string): Observable<CriarRefeicaoResponse> {
+    const headers = this.getAuthHeaders(true);
+    const request = { nomeRefeicao };
+    return this.http.patch<CriarRefeicaoResponse>(
+      `${this.apiUrl}/refeicao/${refeicaoId}/nome`, 
+      request, 
+      { headers }
+    );
+  }
+
   excluirRefeicao(refeicaoId: string): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.delete(`${this.apiUrl}/refeicao/${refeicaoId}`, { headers });

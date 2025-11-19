@@ -1,7 +1,23 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RegistroDiario } from '../../models/history.model';
 import { AuthService } from '../../services/auth.service';
 import { RefeicaoDto } from 'src/app/models/snack.model';
+
+interface RefeicaoComId {
+  id: string;
+  nome: string;
+  alimentos: Array<{
+    descricao: string;
+    calorias: number;
+  }>;
+  totalCalorias: number;
+}
+
+interface RegistroDiarioComId extends RegistroDiario {
+  refeicoes: RefeicaoComId[];
+}
 
 @Component({
   selector: 'app-history',
@@ -10,10 +26,22 @@ import { RefeicaoDto } from 'src/app/models/snack.model';
 })
 export class HistoryComponent implements OnInit {
 
-  historico: RegistroDiario[] = [];
-  diaExpandido: number | null = 0; // O primeiro dia (hoje) começa expandido
+  historico: RegistroDiarioComId[] = [];
+  diaExpandido: number | null = 0;
   carregando: boolean = false;
   erro: string = '';
+
+  // Controles do modal de exclusão
+  modalExcluirAberto: boolean = false;
+  refeicaoParaExcluir: { id: string; nome: string } | null = null;
+  excluindo: boolean = false;
+
+  // Controles do modal de edição
+  modalEditarAberto: boolean = false;
+  refeicaoParaEditar: { id: string; nome: string } | null = null;
+  nomeEdicao: string = '';
+  editando: boolean = false;
+  erroEdicao: string = '';
 
   constructor(private authService: AuthService) { }
 
@@ -22,15 +50,116 @@ export class HistoryComponent implements OnInit {
   }
 
   toggleDia(index: number): void {
-    // Se o dia clicado já está aberto, fecha. Senão, abre.
     this.diaExpandido = this.diaExpandido === index ? null : index;
   }
+
+  // ============ MÉTODOS DE EXCLUSÃO ============
+
+  abrirModalExcluir(refeicaoId: string, nomeRefeicao: string): void {
+    this.refeicaoParaExcluir = { id: refeicaoId, nome: nomeRefeicao };
+    this.modalExcluirAberto = true;
+  }
+
+  fecharModalExcluir(): void {
+    if (!this.excluindo) {
+      this.modalExcluirAberto = false;
+      this.refeicaoParaExcluir = null;
+    }
+  }
+
+  confirmarExclusao(): void {
+    if (!this.refeicaoParaExcluir || this.excluindo) return;
+
+    this.excluindo = true;
+
+    this.authService.excluirRefeicao(this.refeicaoParaExcluir.id).subscribe({
+      next: () => {
+        console.log('✅ Refeição excluída com sucesso!');
+        this.excluindo = false;
+        this.fecharModalExcluir();
+        this.carregarHistorico(); // Recarrega o histórico
+      },
+      error: (error) => {
+        console.error('❌ Erro ao excluir refeição:', error);
+        this.excluindo = false;
+        alert('Erro ao excluir refeição. Tente novamente.');
+      }
+    });
+  }
+
+  // ============ MÉTODOS DE EDIÇÃO ============
+
+  abrirModalEditar(refeicaoId: string, nomeRefeicao: string): void {
+    this.refeicaoParaEditar = { id: refeicaoId, nome: nomeRefeicao };
+    this.nomeEdicao = nomeRefeicao;
+    this.erroEdicao = '';
+    this.modalEditarAberto = true;
+  }
+
+  fecharModalEditar(): void {
+    if (!this.editando) {
+      this.modalEditarAberto = false;
+      this.refeicaoParaEditar = null;
+      this.nomeEdicao = '';
+      this.erroEdicao = '';
+    }
+  }
+
+  confirmarEdicao(): void {
+    if (!this.refeicaoParaEditar || this.editando) return;
+
+    if (!this.nomeEdicao.trim()) {
+      this.erroEdicao = 'Por favor, informe o nome da refeição.';
+      return;
+    }
+
+    this.editando = true;
+    this.erroEdicao = '';
+
+    // Usa o novo método para atualizar apenas o nome
+    this.authService.atualizarNomeRefeicao(
+      this.refeicaoParaEditar.id,
+      this.nomeEdicao
+    ).subscribe({
+      next: (response) => {
+        console.log('✅ Nome da refeição atualizado com sucesso!', response);
+        
+        // Atualiza apenas o nome localmente, sem recarregar tudo
+        this.atualizarRefeicaoLocal(this.refeicaoParaEditar!.id, this.nomeEdicao);
+        
+        this.editando = false;
+        this.fecharModalEditar();
+      },
+      error: (error) => {
+        console.error('❌ Erro ao atualizar refeição:', error);
+        this.editando = false;
+        
+        if (error.error?.mensagem) {
+          this.erroEdicao = error.error.mensagem;
+        } else {
+          this.erroEdicao = 'Erro ao atualizar refeição. Tente novamente.';
+        }
+      }
+    });
+  }
+
+  // Atualiza o nome da refeição localmente sem recarregar
+  private atualizarRefeicaoLocal(refeicaoId: string, novoNome: string): void {
+    for (const dia of this.historico) {
+      const refeicao = dia.refeicoes.find(r => r.id === refeicaoId);
+      if (refeicao) {
+        refeicao.nome = novoNome;
+        break;
+      }
+    }
+  }
+
+  // ============ CARREGAMENTO DE DADOS ============
 
   private carregarHistorico(): void {
     this.carregando = true;
     this.erro = '';
 
-    // Buscar todas as refeições do backend
     this.authService.obterRefeicoes().subscribe({
       next: (refeicoes: RefeicaoDto[]) => {
         this.processarRefeicoes(refeicoes);
@@ -40,18 +169,15 @@ export class HistoryComponent implements OnInit {
         console.error('Erro ao carregar histórico:', error);
         this.erro = 'Não foi possível carregar o histórico de refeições.';
         this.carregando = false;
-        // Fallback para dados fictícios em caso de erro (opcional)
-        // this.gerarHistoricoFicticio();
       }
     });
   }
 
   private processarRefeicoes(refeicoes: RefeicaoDto[]): void {
-    // Agrupar refeições por data
     const refeicoesAgrupadas = new Map<string, RefeicaoDto[]>();
 
     refeicoes.forEach(refeicao => {
-      const dataString = refeicao.data; // formato ISO da API
+      const dataString = refeicao.data;
       
       if (!refeicoesAgrupadas.has(dataString)) {
         refeicoesAgrupadas.set(dataString, []);
@@ -59,15 +185,12 @@ export class HistoryComponent implements OnInit {
       refeicoesAgrupadas.get(dataString)!.push(refeicao);
     });
 
-    // Converter para o formato esperado pelo template
-    const historicoTemp: RegistroDiario[] = [];
+    const historicoTemp: RegistroDiarioComId[] = [];
 
-    // Ordenar as datas (mais recente primeiro)
     const datasOrdenadas = Array.from(refeicoesAgrupadas.keys()).sort((a, b) => {
       return new Date(b).getTime() - new Date(a).getTime();
     });
 
-    // Obter a data de hoje em formato DateOnly (sem hora)
     const hoje = new Date();
     const dataHojeString = this.formatarDataParaComparacao(hoje);
 
@@ -79,6 +202,7 @@ export class HistoryComponent implements OnInit {
         totalCaloriasDia += ref.totalCalorias;
 
         return {
+          id: ref.id, // ✅ Agora inclui o ID da refeição
           nome: ref.nomeRef,
           alimentos: ref.alimentos.map(alim => ({
             descricao: `${alim.descricao} (${alim.quantidade}${alim.unidade})`,
@@ -88,7 +212,6 @@ export class HistoryComponent implements OnInit {
         };
       });
 
-      // CORREÇÃO: Criar a data corretamente para evitar problemas de timezone
       const dataRefeicao = this.criarDataLocal(dataString);
       const isHoje = this.formatarDataParaComparacao(dataRefeicao) === dataHojeString;
 
@@ -103,60 +226,19 @@ export class HistoryComponent implements OnInit {
     this.historico = historicoTemp;
   }
 
-  // NOVO MÉTODO: Criar data local a partir de string YYYY-MM-DD
   private criarDataLocal(dataString: string): Date {
-    // Se a string vier no formato ISO completo (2025-11-08T00:00:00)
     if (dataString.includes('T')) {
       dataString = dataString.split('T')[0];
     }
     
-    // Dividir a string em ano, mês e dia
     const [ano, mes, dia] = dataString.split('-').map(Number);
-    
-    // Criar data local (sem conversão de timezone)
     return new Date(ano, mes - 1, dia);
   }
 
-  // Método auxiliar para comparar apenas ano, mês e dia
   private formatarDataParaComparacao(data: Date): string {
     const ano = data.getFullYear();
     const mes = String(data.getMonth() + 1).padStart(2, '0');
     const dia = String(data.getDate()).padStart(2, '0');
     return `${ano}-${mes}-${dia}`;
-  }
-
-  // Método fictício mantido para referência/teste (pode remover depois)
-  private gerarHistoricoFicticio(): void {
-    const historicoTemp = [];
-    for (let i = 0; i < 14; i++) {
-      const data = new Date();
-      data.setDate(data.getDate() - i);
-
-      const numRefeicoes = Math.floor(Math.random() * 3) + 2;
-      const refeicoes = [];
-      let totalCaloriasDia = 0;
-
-      for (let j = 0; j < numRefeicoes; j++) {
-        const alimentos = [
-          { descricao: 'Alimento ' + (Math.floor(Math.random() * 5) + 1), calorias: Math.floor(Math.random() * 300) + 100 },
-          { descricao: 'Alimento ' + (Math.floor(Math.random() * 5) + 6), calorias: Math.floor(Math.random() * 200) + 50 }
-        ];
-        const totalCaloriasRefeicao = alimentos.reduce((soma, al) => soma + al.calorias, 0);
-        totalCaloriasDia += totalCaloriasRefeicao;
-
-        refeicoes.push({
-          nome: 'Refeição ' + (j + 1),
-          alimentos: alimentos,
-          totalCalorias: totalCaloriasRefeicao
-        });
-      }
-
-      historicoTemp.push({
-        data: data,
-        refeicoes: refeicoes,
-        totalCaloriasDia: totalCaloriasDia
-      });
-    }
-    this.historico = historicoTemp;
   }
 }
