@@ -62,7 +62,12 @@ export class AuthService {
   criarRefeicao(descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
     const headers = this.getAuthHeaders(true);
     const request: CriarRefeicaoRequest = { descricaoRefeicao, nomeRefeicao };
-    return this.http.post<CriarRefeicaoResponse>(`${this.apiUrl}/refeicao`, request, { headers });
+    
+    console.log('📤 Enviando requisição para criar refeição:', request);
+    
+    return this.http.post<CriarRefeicaoResponse>(`${this.apiUrl}/refeicao`, request, { headers }).pipe(
+      tap(response => console.log('📥 Resposta da criação:', response))
+    );
   }
 
   obterRefeicoesDeHoje(): Observable<RefeicoesDoHojeResponse> {
@@ -80,7 +85,24 @@ export class AuthService {
   atualizarRefeicao(refeicaoId: string, descricaoRefeicao: string, nomeRefeicao: string = ''): Observable<CriarRefeicaoResponse> {
     const headers = this.getAuthHeaders(true);
     const request: CriarRefeicaoRequest = { descricaoRefeicao, nomeRefeicao };
-    return this.http.put<CriarRefeicaoResponse>(`${this.apiUrl}/refeicao/${refeicaoId}`, request, { headers });
+    
+    console.log('📤 Enviando requisição para atualizar refeição:');
+    console.log('   - ID:', refeicaoId);
+    console.log('   - Request:', request);
+    console.log('   - URL:', `${this.apiUrl}/refeicao/${refeicaoId}`);
+    
+    return this.http.put<CriarRefeicaoResponse>(`${this.apiUrl}/refeicao/${refeicaoId}`, request, { headers }).pipe(
+      tap(
+        response => {
+          console.log('📥 Resposta da atualização (sucesso):', response);
+        },
+        error => {
+          console.error('❌ Erro na atualização:', error);
+          console.error('   - Status:', error.status);
+          console.error('   - Body:', error.error);
+        }
+      )
+    );
   }
 
   atualizarNomeRefeicao(refeicaoId: string, nomeRefeicao: string): Observable<CriarRefeicaoResponse> {
@@ -110,6 +132,7 @@ export class AuthService {
   }
 
   conversarComIA(mensagem: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ChatIa/conversar`, { mensagem });
+    const headers = this.getAuthHeaders(true);
+    return this.http.post(`${this.apiUrl}/ChatIa/conversar`, { mensagem }, { headers });
   }
 }
