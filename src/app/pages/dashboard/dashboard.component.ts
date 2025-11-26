@@ -735,8 +735,9 @@ export class DashboardComponent implements OnInit {
       this.authService.conversarComIA(mensagem).subscribe({
         next: (resposta) => {
           if (resposta.sucesso && resposta.resposta) {
+            const textoFormatado = resposta.resposta.replace(/\n/g, '<br>');
             this.mensagensChatIA.push({
-              texto: resposta.resposta,
+              texto: textoFormatado,
               tipo: 'ia',
               timestamp: new Date()
             });
