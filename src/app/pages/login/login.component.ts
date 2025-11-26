@@ -1,5 +1,3 @@
-// ARQUIVO: src/app/pages/login/login.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -13,12 +11,13 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
-  errorMessage: string | null = null; // Para exibir erros da API
+  errorMessage: string | null = null;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService, // <-- INJETE O SERVIÇO
-    private router: Router          // <-- INJETE O ROUTER
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -28,24 +27,23 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // ATUALIZE O MÉTODO onSubmit
   onSubmit(): void {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.isLoading) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
     this.errorMessage = null;
+    this.isLoading = true;
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        //SUCESSO
         this.router.navigate(['/calculating']);
       },
       error: (err) => {
-        // ERRO!
         console.error('Erro no login:', err);
         this.errorMessage = 'E-mail ou senha inválidos. Por favor, tente novamente.';
+        this.isLoading = false;
       }
     });
   }

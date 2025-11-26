@@ -1,56 +1,79 @@
-/* ---------- Layout Geral ---------- */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: #ead626; /* Amarelo principal */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f3d4 0%, #f5eab8 50%, #f0e199 100%);
   font-family: "Poppins", sans-serif;
   text-align: center;
-  animation: fadeIn 1s ease-in;
+  padding: 2rem 1rem;
+  animation: fadeIn 0.8s ease-in;
 }
 
-/* ---------- Logo ---------- */
-.logo-container img {
-  width: 200px; /* mesmo tamanho da tela de login */
+.logo-container {
   margin-bottom: 2rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.logo-container img {
+  width: 160px;
+  height: auto;
   animation: float 2.5s ease-in-out infinite;
 }
 
-/* ---------- Texto ---------- */
 .loading-text {
-  font-size: 1.1rem;
-  color: #2c3e50;
+  font-size: 1rem;
+  color: #333;
   font-weight: 500;
   margin-bottom: 2rem;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  opacity: 0.9;
 }
 
-/* ---------- Barra de Progresso ---------- */
 .progress-bar-container {
-  width: 80%;
-  max-width: 400px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.6);
+  width: 90%;
+  max-width: 380px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 50px;
   overflow: hidden;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
 }
 
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(135deg, #f4e04d, #e5c500);
+  background: linear-gradient(135deg, #f4e04d 0%, #e5c500 100%);
   border-radius: 50px;
-  animation: progressAnimation 4s ease-in-out infinite;
+  animation: progressAnimation 2.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(229, 197, 0, 0.4);
+  position: relative;
 }
 
-/* ---------- Animações ---------- */
+.progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -63,30 +86,92 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
 }
 
 @keyframes progressAnimation {
   0% {
     width: 0%;
+    opacity: 0.8;
   }
   50% {
-    width: 90%;
+    width: 95%;
+    opacity: 1;
   }
   100% {
     width: 0%;
+    opacity: 0.8;
   }
 }
 
-/* ---------- Responsividade ---------- */
-@media (max-width: 480px) {
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 768px) {
   .logo-container img {
-    width: 150px;
-  } 
+    width: 140px;
+  }
 
   .loading-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .progress-bar-container {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .logo-container {
+    margin-bottom: 1.75rem;
+  }
+
+  .logo-container img {
+    width: 120px;
+  }
+
+  .loading-text {
+    font-size: 0.9rem;
     padding: 0 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .progress-bar-container {
+    max-width: 280px;
+    height: 8px;
+  }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .loading-container {
+    padding: 1rem;
+  }
+
+  .logo-container {
+    margin-bottom: 1.25rem;
+  }
+
+  .logo-container img {
+    width: 100px;
+  }
+
+  .loading-text {
+    font-size: 0.875rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .progress-bar-container {
+    max-width: 300px;
   }
 }

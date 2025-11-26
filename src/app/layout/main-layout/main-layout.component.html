@@ -1,5 +1,7 @@
 <div class="layout-container">
-  <aside class="sidebar">
+  <button class="mobile-menu-toggle" (click)="toggleSidebar()" aria-label="Abrir menu">☰</button>
+
+  <aside class="sidebar" [class.mobile-open]="isSidebarOpen">
     <div class="sidebar-header">
       <img src="assets/images/logo.png" alt="Logo NutriTrack" class="logo">
     </div>
@@ -23,6 +25,8 @@
       </a>
     </div>
   </aside>
+
+  <div class="sidebar-overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
 
   <main class="main-content">
     <router-outlet></router-outlet>

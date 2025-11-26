@@ -26,8 +26,8 @@
       <div class="macros-grid">
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Proteínas</span>
-            <span class="macro-valor">{{ proteinasMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">Proteínas</span>
+            <span class="macro-valor" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">{{ proteinasMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -36,14 +36,17 @@
                 [style.width.%]="calcularPercentual(proteinasConsumidas, proteinasMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">{{ proteinasConsumidas | number:'1.0-0' }}g / {{ proteinasMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="proteinasConsumidas >= proteinasMeta && proteinasMeta > 0">
+            ✅ Meta de proteínas atingida!
           </div>
         </div>
 
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Carboidratos</span>
-            <span class="macro-valor">{{ carboidratosMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">Carboidratos</span>
+            <span class="macro-valor" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">{{ carboidratosMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -52,14 +55,17 @@
                 [style.width.%]="calcularPercentual(carboidratosConsumidos, carboidratosMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">{{ carboidratosConsumidos | number:'1.0-0' }}g / {{ carboidratosMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="carboidratosConsumidos >= carboidratosMeta && carboidratosMeta > 0">
+            ✅ Meta de carboidratos atingida!
           </div>
         </div>
 
         <div class="macro-item">
           <div class="macro-header">
-            <span class="macro-label">Gorduras</span>
-            <span class="macro-valor">{{ gordurasMeta }}g</span>
+            <span class="macro-label" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">Gorduras</span>
+            <span class="macro-valor" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">{{ gordurasMeta }}g</span>
           </div>
           <div class="macro-progress-wrapper">
             <div class="macro-progress-bar-container">
@@ -68,7 +74,10 @@
                 [style.width.%]="calcularPercentual(gordurasConsumidas, gordurasMeta)">
               </div>
             </div>
-            <span class="macro-progress-text">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+            <span class="macro-progress-text" [class.meta-atingida]="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">{{ gordurasConsumidas | number:'1.0-0' }}g / {{ gordurasMeta }}g</span>
+          </div>
+          <div class="meta-atingida-alert" *ngIf="gordurasConsumidas >= gordurasMeta && gordurasMeta > 0">
+            ✅ Meta de gorduras atingida!
           </div>
         </div>
       </div>
@@ -113,6 +122,13 @@
             (click)="toggleHistoricoChat()"
             title="Ver histórico">
             📅
+          </button>
+          <button 
+            type="button" 
+            class="btn-icon" 
+            (click)="toggleChatIA()"
+            title="Sugestões da IA">
+            🤖
           </button>
           <button 
             type="button" 
@@ -167,6 +183,54 @@
           </div>
         </div>
       </div>
+      <!--
+      <div class="chat-ia-modal" [class.visible]="mostrarChatIA">
+        <div class="historico-overlay" (click)="toggleChatIA()"></div>
+        <div class="chat-ia-content">
+          <div class="chat-ia-header">
+            <h4>💬 Sugestões da IA Nutricional</h4>
+            <div class="chat-ia-header-actions">
+              <button 
+                type="button" 
+                class="btn-limpar-ia" 
+                (click)="limparChatIA()"
+                title="Limpar conversa">
+                🗑️
+              </button>
+              <button type="button" class="btn-close" (click)="toggleChatIA()">✕</button>
+            </div>
+          </div>
+          
+          <div class="chat-ia-window">
+            <div *ngFor="let mensagem of mensagensChatIA" 
+                [ngClass]="mensagem.tipo === 'usuario' ? 'user-message-ia' : 'ia-message'">
+              <div class="message-content">{{ mensagem.texto }}</div>
+              <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+            </div>
+            
+            <div *ngIf="aguardandoRespostaIA" class="ia-message typing-indicator">
+              <div class="message-content">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+          </div>
+
+          <form class="chat-ia-input-form" (submit)="enviarMensagemIA($event)">
+            <input 
+              type="text" 
+              name="chatIAInput" 
+              placeholder="Digite sua pergunta sobre nutrição..." 
+              autocomplete="off"
+              [disabled]="aguardandoRespostaIA">
+            <button type="submit" [disabled]="aguardandoRespostaIA">
+              {{ aguardandoRespostaIA ? 'Enviando...' : 'Enviar' }}
+            </button>
+          </form>
+        </div>
+      </div>
+      -->
       
       <div class="chat-window">
         <div *ngFor="let mensagem of mensagensChat" 
@@ -207,6 +271,7 @@
 
       <form class="chat-input-form" (submit)="enviarMensagemChat($event)">
         <input 
+          #chatInput
           type="text" 
           name="chatInput" 
           placeholder="Digite sua refeição aqui..." 
@@ -220,7 +285,45 @@
   </main>
 </div>
 
-<div class="modal-overlay" *ngIf="mostrarConfirmacao">
+<div class="chat-ia-modal" [class.visible]="mostrarChatIA">
+  <div class="historico-overlay" (click)="toggleChatIA()"></div>
+
+  <div class="chat-ia-content">
+    <div class="chat-ia-header">
+      <h4>💬 Sugestões da IA Nutricional</h4>
+
+      <div class="chat-ia-header-actions">
+        <button type="button" class="btn-limpar-ia" (click)="limparChatIA()" title="Limpar conversa">🗑️</button>
+        <button type="button" class="btn-close" (click)="toggleChatIA()">✕</button>
+      </div>
+    </div>
+
+    <div class="chat-ia-window">
+      <div *ngFor="let mensagem of mensagensChatIA" 
+           [ngClass]="mensagem.tipo === 'usuario' ? 'user-message-ia' : 'ia-message'">
+        <div class="message-content" [innerHTML]="mensagem.texto"></div>
+        <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
+      </div>
+
+      <div *ngIf="aguardandoRespostaIA" class="ia-message typing-indicator">
+        <div class="message-content">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <form class="chat-ia-input-form" (submit)="enviarMensagemIA($event)">
+      <input type="text" name="chatIAInput" placeholder="Digite sua pergunta sobre nutrição..." autocomplete="off" [disabled]="aguardandoRespostaIA">
+      <button type="submit" [disabled]="aguardandoRespostaIA">
+        {{ aguardandoRespostaIA ? 'Enviando...' : 'Enviar' }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" [class.visible]="mostrarConfirmacao">
   <div class="modal-content">
     <h3>{{ tituloConfirmacao }}</h3>
     <p>{{ mensagemConfirmacao }}</p>
