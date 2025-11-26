@@ -301,7 +301,7 @@
     <div class="chat-ia-window">
       <div *ngFor="let mensagem of mensagensChatIA" 
            [ngClass]="mensagem.tipo === 'usuario' ? 'user-message-ia' : 'ia-message'">
-        <div class="message-content">{{ mensagem.texto }}</div>
+        <div class="message-content" [innerHTML]="mensagem.texto"></div>
         <div class="message-time">{{ mensagem.timestamp | date:'HH:mm' }}</div>
       </div>
 
