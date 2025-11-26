@@ -994,6 +994,136 @@
   box-shadow: 0 2px 6px rgba(21, 87, 36, 0.1);
 }
 
+.editing-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  animation: slideDown 0.3s ease;
+
+  .editing-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-cancelar-edicao {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-input-form {
+  input {
+    transition: all 0.3s ease;
+  }
+
+  &:has(+ .editing-banner) input,
+  input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+}
+
+.message-actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  .btn-editar,
+  .btn-excluir {
+    background: transparent;
+    border: none;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+
+  .btn-editar:hover {
+    background: rgba(102, 126, 234, 0.1);
+  }
+
+  .btn-excluir:hover {
+    background: rgba(231, 76, 60, 0.1);
+  }
+}
+
+.gemini-message:hover .message-actions {
+  opacity: 1;
+}
+
+.user-message.editing-highlight {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-left: 3px solid #667eea;
+  animation: pulseHighlight 2s ease-in-out infinite;
+}
+
+@keyframes pulseHighlight {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
+  }
+}
+
+.chat-ia-modal {
+  display: none;
+}
+
+.chat-ia-modal.visible {
+  display: flex;
+}
+
+.modal-overlay {
+  display: none;
+}
+
+.modal-overlay.visible {
+  display: flex;
+}
+
+
 @media (max-width: 1200px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
