@@ -4,7 +4,7 @@ export interface AlimentoConsumido {
 }
 
 export interface Refeicao {
-  nome: string; // Ex: 'Café da Manhã'
+  nome: string;
   alimentos: AlimentoConsumido[];
   totalCalorias: number;
 }
