@@ -18,7 +18,6 @@ export enum Objetivo {
   GanharMassa = 3,
 }
 
-// A interface principal que define a estrutura dos dados de registro
 export interface RegisterUser {
   nomeCompleto: string;
   email: string;
