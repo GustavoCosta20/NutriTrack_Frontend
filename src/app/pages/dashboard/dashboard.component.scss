@@ -1179,7 +1179,6 @@
   display: flex;
 }
 
-
 /* ======= RESPONSIVIDADE ATUALIZADA ======= */
 
 /* Tablets e telas médias */
@@ -1221,7 +1220,7 @@
 
     .gemini-message,
     .user-message {
-      max-width: 100%; /* ← impede corte */
+      max-width: 100%; /* impede corte */
     }
 
     .chat-window {
@@ -1277,95 +1276,7 @@
 
       button {
         width: 100%;
-        padding: 0.95rem;
       }
     }
-  }
-
-  .custom-legend {
-    gap: 0.75rem;
-
-    .legend-item {
-      font-size: 0.8rem;
-    }
-  }
-}
-
-/* Celulares extremamente pequenos (até 360px) */
-@media (max-width: 360px) {
-
-  .card {
-    padding: 0.9rem;
-  }
-
-  .calorias-card .calorias-valor {
-    font-size: 2rem;
-  }
-
-  .chat-card {
-    .message-content {
-      font-size: 0.8rem;
-    }
-  }
-
-  .dashboard-header h1 {
-    font-size: 1.35rem;
-  }
-}
-
-/* ===== FIX: BOTÕES DE EDITAR/EXCLUIR SUMINDO NO MOBILE ===== */
-
-.message-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.message-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0; /* <-- impede os botões de sumir */
-}
-
-.message-actions button {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
-/* 👉 Responsividade específica */
-@media (max-width: 768px) {
-
-  /* Cada mensagem deve ter largura 100% no celular */
-  .gemini-message,
-  .user-message {
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-
-  .message-footer {
-    flex-wrap: wrap;            /* permite quebrar em duas linhas */
-  }
-
-  .message-time {
-    font-size: 0.8rem;
-  }
-
-  .message-actions {
-    margin-left: auto;          /* empurra os botões para direita */
-    transform: scale(0.9);      /* reduz levemente */
-  }
-}
-
-@media (max-width: 480px) {
-  .message-actions {
-    transform: scale(0.8);
   }
 }
