@@ -4,20 +4,9 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # NutriTrack-Frontend-TCC
 > Interface web do Sistema de Acompanhamento Nutricional com IA – Desenvolvido por Gustavo Costa
-
-## Development server
 [![Status do Projeto](https://img.shields.io/static/v1?label=STATUS&message=CONCLUÍDO&color=GREEN&style=for-the-badge)]()
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-### 🔗 Aplicação: https://nutritrack-lifestyle.vercel.app/login
-### 🔗 Backend: https://github.com/GustavoCosta20/NutriTrack_Backend.git
-### 🔗 RFC: https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy82MTBlYjk3MTZkMjBiYWZjL0lRQlZTZ05aRXdPd1NaN0hBLUNqT1F6c0FYeHRXX3R5SWZscXNlU2VIdDYxVWNVP2U9VU5HSHMz&cid=610EB9716D20BAFC&id=610EB9716D20BAFC%21s59034a55031349b09ec703e0a3390cec&parId=610EB9716D20BAFC%21sea8cc6beffdb43d7976fbc7da445c639&o=OneUp
-
-## Code scaffolding
 <br>
-
-Run `ng generate` para gerar um novo componente. Você também pode usar: `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
 ## 🔎 Visão Geral
 Este repositório contém o **frontend do NutriTrack**, desenvolvido em **Angular**, responsável pela interface de interação com o usuário.
@@ -42,8 +31,11 @@ O sistema revoluciona o acompanhamento dietético, ele calcula metas personaliza
 - Angular CLI
 - Backend NutriTrack em execução (Local ou Azure)
 
-## Rodando o projeto:
+## Gerar componentes:
+Run `ng generate` para gerar um novo componente. Você também pode usar: `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
+## Rodando o projeto:
+```bash
 # 1. Clone o repositório
 git clone [https://github.com/GustavoCosta20/NutriTrack_Frontend.git](https://github.com/GustavoCosta20/NutriTrack_Frontend.git)
 
@@ -65,3 +57,8 @@ http://localhost:4200/
 
 ## Rodar testes unitários
 Run `ng test` para executar os testes unitários via [Karma](https://karma-runner.github.io).
+```
+
+### 🔗 Aplicação: https://nutritrack-lifestyle.vercel.app/login
+### 🔗 Backend: https://github.com/GustavoCosta20/NutriTrack_Backend.git
+### 🔗 RFC: https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy82MTBlYjk3MTZkMjBiYWZjL0lRQlZTZ05aRXdPd1NaN0hBLUNqT1F6c0FYeHRXX3R5SWZscXNlU2VIdDYxVWNVP2U9VU5HSHMz&cid=610EB9716D20BAFC&id=610EB9716D20BAFC%21s59034a55031349b09ec703e0a3390cec&parId=610EB9716D20BAFC%21sea8cc6beffdb43d7976fbc7da445c639&o=OneUp
