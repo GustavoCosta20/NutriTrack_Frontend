@@ -1,10 +1,7 @@
-# NutriTrack Web
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.
+<img width="1032" height="270" alt="rfc" src="https://github.com/user-attachments/assets/45bec75b-940c-4196-81c3-9725b6772b33" />
 
 # NutriTrack-Frontend-TCC
 > Interface web do Sistema de Acompanhamento Nutricional com IA – Desenvolvido por Gustavo Costa
-[![Status do Projeto](https://img.shields.io/static/v1?label=STATUS&message=CONCLUÍDO&color=GREEN&style=for-the-badge)]()
 
 <br>
 
@@ -59,6 +56,6 @@ http://localhost:4200/
 Run `ng test` para executar os testes unitários via [Karma](https://karma-runner.github.io).
 ```
 
-### 🔗 Aplicação: https://nutritrack-lifestyle.vercel.app/login
-### 🔗 Backend: https://github.com/GustavoCosta20/NutriTrack_Backend.git
-### 🔗 RFC: https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy82MTBlYjk3MTZkMjBiYWZjL0lRQlZTZ05aRXdPd1NaN0hBLUNqT1F6c0FYeHRXX3R5SWZscXNlU2VIdDYxVWNVP2U9VU5HSHMz&cid=610EB9716D20BAFC&id=610EB9716D20BAFC%21s59034a55031349b09ec703e0a3390cec&parId=610EB9716D20BAFC%21sea8cc6beffdb43d7976fbc7da445c639&o=OneUp
+### 🔗 Backend: [Acessar repositório](https://github.com/GustavoCosta20/NutriTrack_Backend.git)
+### 🔗 Aplicação: [Acessar Site](https://nutritrack-lifestyle.vercel.app/login)
+### 🔗 Documentação RFC: [Acessar documento RFC](https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy82MTBlYjk3MTZkMjBiYWZjL0lRQlZTZ05aRXdPd1NaN0hBLUNqT1F6c0FYeHRXX3R5SWZscXNlU2VIdDYxVWNVP2U9VU5HSHMz&cid=610EB9716D20BAFC&id=610EB9716D20BAFC%21s59034a55031349b09ec703e0a3390cec&parId=610EB9716D20BAFC%21sea8cc6beffdb43d7976fbc7da445c639&o=OneUp)
