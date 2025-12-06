@@ -4,14 +4,12 @@
 > Interface web do Sistema de Acompanhamento Nutricional com IA – Desenvolvido por Gustavo Costa
 
 <br>
-
 ## 🔎 Visão Geral
 Este repositório contém o **frontend do NutriTrack**, desenvolvido em **Angular**, responsável pela interface de interação com o usuário.
 
 O sistema revoluciona o acompanhamento dietético, ele calcula metas personalizadas automaticamente com base nas informações do usuário e faz a integração com **Inteligência Artificial (Google Gemini)** para registrar refeições via chat, eliminando a complexidade de tabelas manuais. Além disso, o assistente virtual oferece sugestões de alimentos e dietas alinhadas ao objetivo do usuário, enquanto dashboards interativos garantem o monitoramento preciso de macronutrientes em tempo real.
 
 <br>
-
 ## 🎨 Tecnologias Utilizadas
 - **Angular 16+**
 - **TypeScript**
@@ -20,7 +18,6 @@ O sistema revoluciona o acompanhamento dietético, ele calcula metas personaliza
 - **Karma para testes unitários**
 
 <br>
-
 ## 🛠️ Como rodar o projeto localmente
 
 ### ✔ Pré-requisitos:
