@@ -3,7 +3,9 @@
   margin: 0 auto;
   padding: 2rem;
   background: transparent;
-  min-height: 100vh;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dashboard-header {
@@ -42,6 +44,7 @@
   flex-direction: column;
   position: relative;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 
   &:hover {
     transform: translateY(-5px);
@@ -678,11 +681,18 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  display: flex;
+  backdrop-filter: blur(4px);
+  display: none; /* Escondido por padrão */
   align-items: center;
   justify-content: center;
   z-index: 2000;
   animation: fadeIn 0.2s ease-in-out;
+  padding: 1rem;
+  box-sizing: border-box;
+  
+  &.visible {
+    display: flex; /* Só aparece quando tem a classe 'visible' */
+  }
 }
 
 .modal-content {
@@ -697,19 +707,24 @@
     0 20px 60px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.25s ease-in-out;
   z-index: 2001;
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-content h3 {
   font-size: 1.4rem;
   color: #333;
-  margin-bottom: 0.75rem;
+  margin: 0 0 0.75rem 0;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .modal-content p {
   font-size: 0.95rem;
   color: #6b6b6b;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
 }
 
 .modal-buttons {
@@ -1037,15 +1052,11 @@
 }
 
 .chat-ia-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
+  display: none;
 }
 
 .chat-ia-modal.visible {
+  display: flex;
   pointer-events: auto;
 }
 
@@ -1087,30 +1098,6 @@
   100% {
     opacity: 0.2;
     transform: translateY(0);
-  }
-}
-
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.chat-input-form {
-  input {
-    transition: all 0.3s ease;
-  }
-
-  &:has(+ .editing-banner) input,
-  input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   }
 }
 
@@ -1163,22 +1150,7 @@
   }
 }
 
-.chat-ia-modal {
-  display: none;
-}
-
-.chat-ia-modal.visible {
-  display: flex;
-}
-
-.modal-overlay {
-  display: none;
-}
-
-.modal-overlay.visible {
-  display: flex;
-}
-
+/* Correções para Mobile */
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -1191,6 +1163,7 @@
     left: 0;
     right: 0;
     margin-top: 1.25rem;
+    padding: 0 1.75rem;
   }
 
   .message-actions {
@@ -1202,27 +1175,63 @@
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 1.25rem 0.85rem;
+    padding: 1rem 0.85rem;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .dashboard-header {
     text-align: center;
+    padding: 0 0.5rem;
 
-    h1 { font-size: 1.75rem; }
-    p { font-size: 1rem; }
+    h1 { 
+      font-size: 1.75rem;
+      word-wrap: break-word;
+    }
+    p { 
+      font-size: 1rem;
+      word-wrap: break-word;
+    }
   }
 
   .card {
     padding: 1.35rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .calorias-card,
+  .macros-card,
+  .progresso-card {
+    min-height: 280px;
+  }
+
+  .calorias-card {
+    h3 {
+      top: 1.35rem;
+      left: 1.35rem;
+      right: 1.35rem;
+    }
+
+    .calorias-valor { 
+      font-size: 2.75rem; 
+    }
+  }
+
+  .progresso-wrapper {
+    padding: 0 1.35rem;
+    bottom: 1.35rem;
   }
 
   .chat-card {
     min-height: 380px;
+    width: 100%;
 
     .gemini-message,
     .user-message {
-      max-width: 100%;
+      max-width: 85%;
     }
 
     .chat-window {
@@ -1239,45 +1248,112 @@
       height: 100% !important;
     }
   }
+
+  .historico-content,
+  .chat-ia-content {
+    width: 95%;
+    max-width: 95%;
+  }
 }
 
 @media (max-width: 480px) {
   .dashboard-container {
-    padding: 1rem 0.65rem;
+    padding: 0.75rem 0.5rem;
   }
 
   .dashboard-header {
-    h1 { font-size: 1.5rem; }
-    p { font-size: 0.9rem; }
+    margin-bottom: 1.5rem;
+    padding: 0 0.25rem;
+
+    h1 { 
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
+    p { 
+      font-size: 0.9rem;
+    }
   }
 
   .card {
     padding: 1.1rem;
     border-radius: 12px;
 
-    h3 { font-size: 0.95rem; }
+    h3 { 
+      font-size: 0.95rem;
+      padding-bottom: 0.5rem;
+    }
   }
 
   .calorias-card {
+    min-height: 250px;
+
     h3 {
-      top: 1.25rem;
-      left: 1.25rem;
-      right: 1.25rem;
+      top: 1.1rem;
+      left: 1.1rem;
+      right: 1.1rem;
     }
 
-    .calorias-valor { font-size: 2.4rem; }
-    .calorias-label { font-size: 1rem; }
+    .calorias-valor { 
+      font-size: 2.25rem; 
+    }
+    .calorias-label { 
+      font-size: 1rem; 
+    }
+  }
+
+  .macros-card,
+  .progresso-card {
+    min-height: 260px;
+  }
+
+  .progresso-wrapper {
+    padding: 0 1.1rem;
+    bottom: 1.1rem;
   }
 
   .chat-card {
     padding: 1rem !important;
+    min-height: 350px;
+
+    .gemini-message,
+    .user-message {
+      max-width: 90%;
+      padding: 0.75rem 0.9rem;
+      font-size: 0.85rem;
+    }
+
+    .chat-window {
+      max-height: 240px;
+      min-height: 200px;
+      padding: 0.75rem;
+    }
 
     .chat-input-form {
       flex-direction: column;
+      gap: 0.5rem;
+
+      input {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+      }
 
       button {
         width: 100%;
+        padding: 0.75rem;
       }
+    }
+  }
+
+  .chart-wrapper {
+    height: 180px !important;
+  }
+
+  .custom-legend {
+    gap: 0.75rem;
+    padding: 0.65rem;
+
+    .legend-item {
+      font-size: 0.8rem;
     }
   }
 }

@@ -3,6 +3,7 @@
   grid-template-columns: 260px 1fr;
   grid-template-rows: 1fr;
   height: 100vh;
+  height: 100dvh; /* Melhor para mobile */
 }
 
 .sidebar {
@@ -17,6 +18,7 @@
   position: relative;
   z-index: 10;
   height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
 }
 
@@ -103,11 +105,12 @@
 }
 
 .sidebar-footer {
-  margin-top: 1.5rem;
+  margin-top: auto; /* Empurra o footer para o final */
   padding-top: 1.5rem;
   border-top: 2px solid rgba(255, 255, 255, 0.1);
   background: none;
   z-index: 2;
+  flex-shrink: 0; /* Impede que seja comprimido */
   
   a {
     margin-bottom: 0.35rem;
@@ -121,7 +124,10 @@
 .main-content {
   background: linear-gradient(135deg, #fffbe0 0%, #ffe066 50%, #ffd600 100%);
   overflow-y: auto;
+  overflow-x: hidden; /* Previne scroll horizontal */
   padding: 2rem 2.5rem;
+  height: 100vh;
+  height: 100dvh;
   
   &::-webkit-scrollbar {
     width: 8px;
@@ -171,30 +177,45 @@
     grid-template-columns: 1fr;
     grid-template-rows: 1fr;
     position: relative;
+    height: 100vh;
+    height: 100dvh;
   }
 
   .sidebar {
     position: fixed;
     top: 0;
-    left: -260px;
-    width: 240px;
+    left: -280px; /* Aumentado para garantir que saia completamente */
+    width: 260px;
     height: 100vh;
-    min-height: 0;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
     z-index: 1000;
     transition: left 0.3s cubic-bezier(0.4,0,0.2,1);
     box-shadow: 8px 0 20px rgba(0,0,0,0.15), 12px 0 40px rgba(0,0,0,0.1);
     padding: 1.25rem 0.85rem;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
+  
   .sidebar.mobile-open {
     left: 0;
   }
+  
   .main-content {
-    padding: 1.25rem 1rem;
+    padding: 5rem 1rem 1.25rem 1rem; /* Padding top maior para o botão do menu */
     grid-column: 1;
     grid-row: 1;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
+  
   .sidebar-overlay {
     display: none;
     position: fixed;
@@ -206,15 +227,17 @@
     backdrop-filter: blur(4px);
     z-index: 999;
   }
+  
   .sidebar-overlay.active {
     display: block;
     animation: fadeIn 0.3s ease;
   }
+  
   .mobile-menu-toggle {
     display: block;
     position: fixed;
-    top: 1.25rem;
-    left: 1.25rem;
+    top: 1rem;
+    left: 1rem;
     z-index: 1001;
     background: linear-gradient(135deg, #f4e04d 0%, #e5c500 100%);
     border: none;
@@ -225,9 +248,19 @@
     font-size: 1.25rem;
     color: #1f1f1f;
   }
+  
   .sidebar-footer {
-    margin-top: 1.5rem;
-    padding-bottom: 1.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    flex-shrink: 0;
+  }
+  
+  /* Garante que o menu Sair seja visível */
+  .sidebar-nav {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -237,15 +270,19 @@
     left: 0 !important;
     width: 260px;
     height: 100vh;
+    height: 100dvh;
     box-shadow: 4px 0 12px rgba(0,0,0,0.08), 8px 0 24px rgba(0,0,0,0.06);
     padding: 1.75rem 1.25rem;
   }
+  
   .sidebar-overlay {
     display: none !important;
   }
+  
   .mobile-menu-toggle {
     display: none !important;
   }
+  
   .main-content {
     padding: 2rem 2.5rem;
   }
@@ -253,14 +290,14 @@
 
 @media (max-width: 480px) {
   .sidebar {
-    width: 240px;
-    left: -260px;
-    padding: 1.25rem 0.85rem;
+    width: 260px;
+    left: -280px;
+    padding: 1rem 0.85rem;
   }
 
   .sidebar-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
     
     .logo {
       max-width: 110px;
@@ -279,7 +316,14 @@
   }
 
   .main-content {
-    padding: 1.25rem 1rem;
+    padding: 4.5rem 0.85rem 1rem 0.85rem;
+  }
+  
+  .mobile-menu-toggle {
+    top: 0.85rem;
+    left: 0.85rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -314,6 +358,15 @@
 
   @media (max-width: 768px) {
     display: block;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
